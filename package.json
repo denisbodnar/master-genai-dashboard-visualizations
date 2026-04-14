@@ -11,7 +11,10 @@
   "scripts": {
     "dev:server": "npm run dev --workspace=server",
     "dev:client": "npm run dev --workspace=client",
-    "test:server": "npm run test --workspace=server"
+    "test:server": "npm run test --workspace=server",
+    "exp:run": "node experiments/src/runner.js",
+    "exp:run:dry": "node experiments/src/runner.js --dry-run",
+    "exp:summarize": "node experiments/src/summarize.js"
   },
   "engines": {
     "node": ">=20"

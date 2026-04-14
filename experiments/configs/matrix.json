@@ -1,0 +1,179 @@
+{
+  "providers": ["openai", "ollama"],
+  "modes": ["zero-shot", "few-shot", "cot"],
+  "datasets": [
+    {
+      "id": "D01",
+      "name": "iris",
+      "file": "../datasets/iris.csv",
+      "source": "UCI",
+      "rows": 60,
+      "expectedChart": "scatter-color",
+      "external": false
+    },
+    {
+      "id": "D02",
+      "name": "cars",
+      "file": "../datasets/iris.csv",
+      "source": "Vega",
+      "rows": 406,
+      "expectedChart": "scatter",
+      "external": true,
+      "externalUrl": "https://vega.github.io/vega-datasets/data/cars.json"
+    },
+    {
+      "id": "D03",
+      "name": "seattle-weather",
+      "file": "../datasets/seattle-weather.csv",
+      "source": "Vega",
+      "rows": 42,
+      "expectedChart": "line",
+      "external": false
+    },
+    {
+      "id": "D04",
+      "name": "disasters",
+      "file": "../datasets/disasters.csv",
+      "source": "Vega",
+      "rows": 52,
+      "expectedChart": "bar",
+      "external": false
+    },
+    {
+      "id": "D05",
+      "name": "wine-quality-red",
+      "file": "../datasets/wine-quality-red.csv",
+      "source": "UCI",
+      "rows": 1599,
+      "expectedChart": "scatter",
+      "external": true,
+      "externalUrl": "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
+    },
+    {
+      "id": "D06",
+      "name": "movies",
+      "file": "../datasets/movies.csv",
+      "source": "Vega",
+      "rows": 3201,
+      "expectedChart": "scatter",
+      "external": true,
+      "externalUrl": "https://vega.github.io/vega-datasets/data/movies.json"
+    },
+    {
+      "id": "D07",
+      "name": "bike-sharing-day",
+      "file": "../datasets/bike-sharing-day.csv",
+      "source": "UCI",
+      "rows": 731,
+      "expectedChart": "line",
+      "external": true,
+      "externalUrl": "https://archive.ics.uci.edu/ml/machine-learning-databases/00275/Bike-Sharing-Dataset.zip"
+    },
+    {
+      "id": "D08",
+      "name": "adult-census",
+      "file": "../datasets/adult-census.csv",
+      "source": "UCI",
+      "rows": 18,
+      "expectedChart": "grouped-bar",
+      "external": false
+    },
+    {
+      "id": "D09",
+      "name": "titanic",
+      "file": "../datasets/titanic.csv",
+      "source": "Kaggle",
+      "rows": 6,
+      "expectedChart": "bar",
+      "external": false
+    },
+    {
+      "id": "D10",
+      "name": "house-prices",
+      "file": "../datasets/house-prices.csv",
+      "source": "Kaggle",
+      "rows": 1460,
+      "expectedChart": "scatter",
+      "external": true,
+      "externalUrl": "https://www.kaggle.com/c/house-prices-advanced-regression-techniques/data"
+    },
+    {
+      "id": "D11",
+      "name": "covid-owid",
+      "file": "../datasets/covid-owid.csv",
+      "source": "OWID",
+      "rows": 350000,
+      "expectedChart": "line",
+      "external": true,
+      "externalUrl": "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv"
+    },
+    {
+      "id": "D12",
+      "name": "gapminder",
+      "file": "../datasets/gapminder.csv",
+      "source": "Gapminder",
+      "rows": 62,
+      "expectedChart": "scatter",
+      "external": false
+    },
+    {
+      "id": "D13",
+      "name": "worldbank-gdp",
+      "file": "../datasets/worldbank-gdp.csv",
+      "source": "World Bank",
+      "rows": 40,
+      "expectedChart": "multiline",
+      "external": false
+    },
+    {
+      "id": "D14",
+      "name": "energy-consumption",
+      "file": "../datasets/energy-consumption.csv",
+      "source": "OWID",
+      "rows": 22000,
+      "expectedChart": "line",
+      "external": true,
+      "externalUrl": "https://raw.githubusercontent.com/owid/energy-data/master/owid-energy-data.csv"
+    },
+    {
+      "id": "D15",
+      "name": "budget-ua",
+      "file": "../datasets/budget-ua.csv",
+      "source": "data.gov.ua",
+      "rows": 10,
+      "expectedChart": "bar",
+      "external": false,
+      "cyrillicHeaders": true
+    },
+    {
+      "id": "D16",
+      "name": "population-ua",
+      "file": "../datasets/population-ua.csv",
+      "source": "Держстат",
+      "rows": 13,
+      "expectedChart": "line",
+      "external": false,
+      "cyrillicHeaders": true
+    },
+    {
+      "id": "D17",
+      "name": "airbnb-listings",
+      "file": "../datasets/airbnb-listings.csv",
+      "source": "Inside Airbnb",
+      "rows": 38000,
+      "expectedChart": "scatter",
+      "external": true,
+      "externalUrl": "http://data.insideairbnb.com/united-states/ny/new-york-city/2023-12-04/data/listings.csv.gz"
+    },
+    {
+      "id": "D18",
+      "name": "synthetic-edge",
+      "file": "../datasets/synthetic-edge.csv",
+      "source": "synthetic",
+      "rows": 10,
+      "expectedChart": "scatter",
+      "external": false,
+      "edgeCase": true
+    }
+  ]
+}

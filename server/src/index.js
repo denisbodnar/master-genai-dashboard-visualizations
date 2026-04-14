@@ -5,6 +5,7 @@ import { config } from './config.js';
 import { inferSchema } from './modules/schemaInference/index.js';
 import { selectChartType } from './modules/chartSelector/index.js';
 import { createProvider } from './modules/llmProvider/index.js';
+import { orchestrate } from './modules/orchestrator/index.js';
 
 const app = express();
 const upload = multer({
@@ -82,6 +83,43 @@ app.post('/api/select-chart', upload.single('file'), async (req, res) => {
     return res.json({ schema, recommendation, provider: providerName ?? 'none' });
   } catch (err) {
     return res.status(400).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/generate
+ * Повний pipeline: CSV → Schema → рекомендація → LLM-генерація → Self-Refine → артефакт.
+ *
+ * Query params:
+ *   ?provider=openai|ollama  — LLM-провайдер (за замовчуванням поверне fallback)
+ *   ?mode=zero-shot|few-shot|cot  — режим промпту (default: zero-shot)
+ */
+app.post('/api/generate', upload.single('file'), async (req, res) => {
+  try {
+    const csvText = extractCsv(req);
+    if (!csvText) return res.status(400).json({ error: 'No CSV data provided' });
+
+    const providerName = req.query.provider;
+    const mode = req.query.mode ?? 'zero-shot';
+
+    let llmProvider = null;
+    if (providerName === 'openai') {
+      if (!config.openai.apiKey) {
+        return res.status(400).json({ error: 'OPENAI_API_KEY is not set' });
+      }
+      llmProvider = createProvider('openai');
+    } else if (providerName === 'ollama') {
+      llmProvider = createProvider('ollama');
+    }
+
+    const result = await orchestrate({
+      csv: csvText,
+      options: { provider: llmProvider, mode },
+    });
+
+    return res.json(result);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 });
 

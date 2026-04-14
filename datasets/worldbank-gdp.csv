@@ -1,0 +1,41 @@
+country,year,gdp_per_capita
+United States,2000,36330
+United States,2005,44308
+United States,2010,47001
+United States,2015,55805
+United States,2020,63530
+Germany,2000,23048
+Germany,2005,34516
+Germany,2010,41513
+Germany,2015,41376
+Germany,2020,46258
+China,2000,959
+China,2005,1744
+China,2010,4561
+China,2015,8067
+China,2020,10500
+India,2000,440
+India,2005,719
+India,2010,1358
+India,2015,1606
+India,2020,1901
+Brazil,2000,3752
+Brazil,2005,4790
+Brazil,2010,11286
+Brazil,2015,8757
+Brazil,2020,6796
+United Kingdom,2000,28072
+United Kingdom,2005,41396
+United Kingdom,2010,38711
+United Kingdom,2015,44306
+United Kingdom,2020,40284
+France,2000,23562
+France,2005,34888
+France,2010,40713
+France,2015,36564
+France,2020,37675
+Japan,2000,38532
+Japan,2005,35757
+Japan,2010,43118
+Japan,2015,34524
+Japan,2020,39890

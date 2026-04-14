@@ -91,27 +91,28 @@ app.post('/api/select-chart', upload.single('file'), async (req, res) => {
  * Повний pipeline: CSV → Schema → рекомендація → LLM-генерація → Self-Refine → артефакт.
  *
  * Query params:
- *   ?provider=openai|ollama  — LLM-провайдер (за замовчуванням поверне fallback)
- *   ?mode=zero-shot|few-shot|cot  — режим промпту (default: zero-shot)
+ *   ?provider=ollama|openai  — LLM-провайдер (default: ollama)
+ *   ?mode=zero-shot|few-shot|cot  — режим промпту (default: few-shot)
  */
 app.post('/api/generate', upload.single('file'), async (req, res) => {
   try {
     const csvText = extractCsv(req);
     if (!csvText) return res.status(400).json({ error: 'No CSV data provided' });
 
-    const providerName = req.query.provider;
-    const mode = req.query.mode ?? 'zero-shot';
+    const providerName = req.query.provider ?? 'ollama';
+    const mode = req.query.mode ?? 'few-shot';
 
-    let llmProvider = null;
-    if (providerName === 'openai') {
-      if (!config.openai.apiKey) {
-        return res.status(400).json({ error: 'OPENAI_API_KEY is not set' });
-      }
-      llmProvider = createProvider('openai');
-    } else if (providerName === 'ollama') {
-      llmProvider = createProvider('ollama');
+    if (!['ollama', 'openai'].includes(providerName)) {
+      return res.status(400).json({ error: `Unknown provider: "${providerName}". Valid: ollama, openai` });
+    }
+    if (!['zero-shot', 'few-shot', 'cot'].includes(mode)) {
+      return res.status(400).json({ error: `Unknown mode: "${mode}". Valid: zero-shot, few-shot, cot` });
+    }
+    if (providerName === 'openai' && !config.openai.apiKey) {
+      return res.status(400).json({ error: 'OPENAI_API_KEY is not set' });
     }
 
+    const llmProvider = createProvider(providerName);
     const result = await orchestrate({
       csv: csvText,
       options: { provider: llmProvider, mode },
@@ -119,7 +120,8 @@ app.post('/api/generate', upload.single('file'), async (req, res) => {
 
     return res.json(result);
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    const status = err.retryable === false ? 400 : 502;
+    return res.status(status).json({ error: err.message });
   }
 });
 

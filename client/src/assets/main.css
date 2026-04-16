@@ -1,30 +1,30 @@
 :root {
-  --color-bg-base: #0f172a;
-  --color-bg-surface: #1e293b;
-  --color-bg-glass: rgba(30, 41, 59, 0.7);
-  --color-bg-glass-hover: rgba(30, 41, 59, 0.9);
-  
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
-  
-  --color-accent: #3b82f6;
-  --color-accent-hover: #2563eb;
-  --color-accent-glow: rgba(59, 130, 246, 0.5);
-  
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-error-bg: rgba(239, 68, 68, 0.1);
+  --color-bg-base:         #ffffff;
+  --color-bg-surface:      #f6f8fa;
+  --color-bg-glass:        rgba(255, 255, 255, 0.9);
+  --color-bg-glass-hover:  rgba(246, 248, 250, 0.95);
 
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-radius: 12px;
-  --transition-fast: 0.15s ease-in-out;
-  --transition-normal: 0.3s ease-in-out;
-  
-  --shadow-glow: 0 0 20px var(--color-accent-glow);
-  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  --shadow-drop: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --color-text-primary:    #1f2328;
+  --color-text-secondary:  #636e7b;
+  --color-text-muted:      #8c959f;
+
+  --color-accent:          #0969da;
+  --color-accent-hover:    #0550ae;
+  --color-accent-glow:     rgba(9, 105, 218, 0.3);
+
+  --color-success:         #1a7f37;
+  --color-warning:         #9a6700;
+  --color-error:           #cf222e;
+  --color-error-bg:        rgba(207, 34, 46, 0.08);
+
+  --border-color:          #d0d7de;
+  --border-radius:         6px;
+  --transition-fast:       0.15s ease-in-out;
+  --transition-normal:     0.3s ease-in-out;
+
+  --shadow-glow:           0 0 0 3px var(--color-accent-glow);
+  --shadow-glass:          0 1px 3px rgba(31, 35, 40, 0.12), 0 8px 24px rgba(66, 74, 83, 0.12);
+  --shadow-drop:           0 1px 0 rgba(31, 35, 40, 0.04);
 }
 
 * {
@@ -34,21 +34,16 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--color-bg-base);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  background-color: var(--color-bg-surface);
   color: var(--color-text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  
-  /* Плавний градієнт на фоні для глибини */
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05), transparent 25%);
 }
 
 #app {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
   display: flex;
@@ -56,103 +51,104 @@ body {
   gap: 2rem;
 }
 
-/* Glassmorphism утиліти */
+/* Card panels */
 .glass-panel {
-  background: var(--color-bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: #ffffff;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-glass);
-  transition: all var(--transition-normal);
+  transition: border-color var(--transition-normal);
 }
 
 .glass-panel:hover {
-  background: var(--color-bg-glass-hover);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: #adb5bd;
 }
 
-/* Кнопки */
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   background: var(--color-bg-surface);
   color: var(--color-text-primary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all var(--transition-fast);
   outline: none;
 }
 
 .btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-1px);
+  background: #eaeef2;
+  border-color: #adb5bd;
 }
 
 .btn:active:not(:disabled) {
-  transform: translateY(0);
+  background: #dde2e7;
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .btn-primary {
   background: var(--color-accent);
+  color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+  box-shadow: 0 1px 0 rgba(31, 35, 40, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--color-accent-hover);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.23);
+  border-color: transparent;
 }
 
-/* Select/Input styling */
+/* Select / Input */
 .select-input {
   appearance: none;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: #ffffff;
   color: var(--color-text-primary);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 0.6rem 2.5rem 0.6rem 1rem;
+  border-radius: var(--border-radius);
+  padding: 0.4rem 2.25rem 0.4rem 0.75rem;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   width: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238c959f' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
 }
 
 .select-input:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  box-shadow: var(--shadow-glow);
 }
 
 .select-input option {
-  background-color: var(--color-bg-surface);
+  background-color: #ffffff;
   color: var(--color-text-primary);
 }
 
-/* Заголовки */
+/* Headings */
 h1, h2, h3 {
   font-weight: 600;
   letter-spacing: -0.025em;
-  color: #fff;
+  color: var(--color-text-primary);
 }
 
 .heading-gradient {
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-image: linear-gradient(135deg, #60a5fa, #a78bfa);
+  background-image: linear-gradient(135deg, #0969da, #6e40c9);
 }
 
 /* Scrollbar */
@@ -161,12 +157,12 @@ h1, h2, h3 {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-bg-base);
+  background: var(--color-bg-surface);
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #d0d7de;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #adb5bd;
 }

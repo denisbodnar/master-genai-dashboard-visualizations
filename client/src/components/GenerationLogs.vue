@@ -100,17 +100,19 @@ const truncateMatch = (text) => {
 }
 
 .panel-header {
-  padding: 1.25rem 1.5rem;
+  padding: 0.875rem 1.25rem;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: var(--color-bg-surface);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 .metrics {
   display: flex;
-  gap: 1rem;
-  font-size: 0.85rem;
+  gap: 0.75rem;
+  font-size: 0.8rem;
   color: var(--color-text-secondary);
 }
 
@@ -118,23 +120,24 @@ const truncateMatch = (text) => {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  padding: 0.2rem 0.5rem;
+  border-radius: 2em;
 }
 
 .icon {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 .logs-content {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .empty-state {
@@ -149,16 +152,15 @@ const truncateMatch = (text) => {
 }
 
 .log-item {
-  background: rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  transition: all var(--transition-fast);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 0.65rem 0.875rem;
+  transition: border-color var(--transition-fast);
 }
 
 .log-item:hover {
-  background: rgba(0, 0, 0, 0.25);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: #adb5bd;
 }
 
 .error-item {
@@ -173,7 +175,7 @@ const truncateMatch = (text) => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .log-title {
@@ -181,66 +183,71 @@ const truncateMatch = (text) => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
 .badge {
   font-size: 0.7rem;
   padding: 0.1rem 0.4rem;
-  border-radius: 4px;
+  border-radius: 2em;
   text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 .badge-success {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+  background: rgba(26, 127, 55, 0.1);
+  color: #1a7f37;
+  border: 1px solid rgba(26, 127, 55, 0.3);
 }
 
 .badge-error {
   background: var(--color-error-bg);
-  color: #f87171;
+  color: var(--color-error);
+  border: 1px solid rgba(207, 34, 46, 0.3);
 }
 
 .text-success { color: var(--color-success); }
-.text-error { color: var(--color-error); }
+.text-error   { color: var(--color-error); }
 .highlight-text { color: var(--color-accent); }
 
 .log-details {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--color-text-secondary);
-  margin-left: 1.5rem;
+  margin-left: 1.4rem;
 }
 
 .error-msg {
-  color: #f87171;
-  font-family: monospace;
+  color: var(--color-error);
+  font-family: 'SFMono-Regular', Consolas, monospace;
   margin-top: 0.25rem;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 0.5rem;
-  border-radius: 4px;
+  background: var(--color-error-bg);
+  border: 1px solid rgba(207, 34, 46, 0.15);
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--border-radius);
   word-break: break-all;
 }
 
 .metrics-line {
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
   font-size: 0.75rem;
-  opacity: 0.7;
+  color: var(--color-text-muted);
 }
 
 .final-status {
-  margin-top: 0.5rem;
-  font-size: 1rem;
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
 }
 
 .status-success {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid var(--color-success);
+  background: rgba(26, 127, 55, 0.06);
+  border: 1px solid rgba(26, 127, 55, 0.3);
+  border-left: 3px solid var(--color-success);
 }
 
 .status-fallback {
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid var(--color-warning);
+  background: rgba(154, 103, 0, 0.06);
+  border: 1px solid rgba(154, 103, 0, 0.3);
+  border-left: 3px solid var(--color-warning);
 }
 </style>

@@ -113,21 +113,22 @@ const renderChart = () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-height: 500px;
+  min-height: 650px;
 }
 
 .panel-header {
-  padding: 1.25rem 1.5rem;
+  padding: 0.875rem 1.25rem;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: var(--color-bg-surface);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 .btn-small {
-  padding: 0.4rem 0.8rem;
+  padding: 0.3rem 0.75rem;
   font-size: 0.8rem;
-  background: rgba(0, 0, 0, 0.2);
 }
 
 .icon {
@@ -147,11 +148,11 @@ const renderChart = () => {
   flex: 1;
   width: 100%;
   height: 100%;
-  min-height: 400px;
-  /* Дочірні svg отримають width:100% height:100% якщо вказано динамічно */
+  min-height: 500px;
+  padding: 1.25rem;
 }
 
-/* Глобальні стилі для SVG всередині враппера */
+/* Global styles for SVG inside wrapper */
 :deep(svg) {
   width: 100%;
   height: 100%;
@@ -160,11 +161,11 @@ const renderChart = () => {
 }
 
 :deep(svg text) {
-  fill: var(--color-text-primary) !important;
+  fill: #1f2328 !important;
 }
 
 :deep(svg line), :deep(svg path.domain) {
-  stroke: var(--border-color) !important;
+  stroke: #d0d7de !important;
 }
 
 .empty-state {
@@ -181,7 +182,7 @@ const renderChart = () => {
 .empty-icon {
   width: 64px;
   height: 64px;
-  opacity: 0.2;
+  opacity: 0.15;
 }
 
 .error-state {
@@ -201,17 +202,19 @@ const renderChart = () => {
 }
 
 .error-msg {
-  font-family: monospace;
-  background: rgba(0, 0, 0, 0.2);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  background: var(--color-error-bg);
+  border: 1px solid rgba(207, 34, 46, 0.2);
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   font-size: 0.85rem;
   word-break: break-all;
 }
 
 .code-view {
   flex: 1;
-  background: #1e1e1e;
+  background: var(--color-bg-surface);
+  border-top: 1px solid var(--border-color);
   overflow: auto;
   padding: 1.5rem;
 }
@@ -223,6 +226,6 @@ const renderChart = () => {
 .code-view code {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 0.85rem;
-  color: #d4d4d4;
+  color: var(--color-text-primary);
 }
 </style>

@@ -90,68 +90,69 @@ const handleFile = (selectedFile) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem 2rem;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
+  padding: 2rem 1.5rem;
+  border: 2px dashed var(--border-color);
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-height: 200px;
+  transition: border-color var(--transition-normal), background var(--transition-normal);
+  min-height: 160px;
 }
 
 .uploader-container:hover {
-  background: var(--color-bg-glass-hover);
   border-color: var(--color-accent);
+  background: rgba(9, 105, 218, 0.04);
 }
 
 .uploader-container.is-dragging {
   border-color: var(--color-accent);
-  background: rgba(59, 130, 246, 0.1);
-  transform: scale(1.02);
+  background: rgba(9, 105, 218, 0.06);
 }
 
 .uploader-container.has-file {
   border-style: solid;
   border-color: var(--color-success);
-  background: rgba(16, 185, 129, 0.05);
+  background: rgba(26, 127, 55, 0.04);
 }
 
 .uploader-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   text-align: center;
 }
 
 .icon-wrapper {
-  width: 64px;
-  height: 64px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-accent);
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal);
 }
 
 .has-file .icon-wrapper {
   color: var(--color-success);
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(26, 127, 55, 0.08);
+  border-color: rgba(26, 127, 55, 0.3);
 }
 
 .icon {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
 }
 
 .text-content h3 {
-  font-size: 1.25rem;
-  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
 }
 
 .text-content p {
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
 }
 
 .file-info p {

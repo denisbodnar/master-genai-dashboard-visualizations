@@ -100,7 +100,9 @@ const handleGenerate = async () => {
 
 .app-header {
   text-align: center;
-  margin-bottom: 1rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.5rem;
 }
 
 .logo {
@@ -112,32 +114,33 @@ const handleGenerate = async () => {
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   color: var(--color-accent);
 }
 
 .app-header h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin: 0;
 }
 
 .subtitle {
   color: var(--color-text-secondary);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
 }
 
 .main-grid {
   display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 2rem;
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
   flex: 1;
+  min-height: calc(100vh - 180px);
 }
 
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .content-area {
@@ -148,6 +151,7 @@ const handleGenerate = async () => {
 @media (max-width: 992px) {
   .main-grid {
     grid-template-columns: 1fr;
+    min-height: auto;
   }
 }
 </style>

@@ -13,11 +13,19 @@ function computeNumeric(values) {
   const sum = nums.reduce((a, b) => a + b, 0);
   const mean = sum / n;
   const variance = nums.reduce((acc, v) => acc + (v - mean) ** 2, 0) / n;
+  
+  const std = Math.sqrt(variance);
+  let skewness = 0;
+  if (std > 0) {
+    skewness = nums.reduce((acc, v) => acc + Math.pow(v - mean, 3), 0) / (n * Math.pow(std, 3));
+  }
+
   return {
     min: Math.min(...nums),
     max: Math.max(...nums),
     mean: round(mean),
-    std: round(Math.sqrt(variance)),
+    std: round(std),
+    skewness: round(skewness),
   };
 }
 

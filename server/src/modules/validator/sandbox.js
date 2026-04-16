@@ -32,10 +32,15 @@ import { createMockD3 } from './mockD3.js';
 export function executeInSandbox(code, { schema, sample, timeoutMs = 2000 }) {
   const mockD3 = createMockD3();
 
+  const contextData = [...(sample ?? [])];
+  if (schema && schema.columns) {
+    contextData.columns = schema.columns.map(c => c.name);
+  }
+
   // ── Контекст виконання (підрозділ 3.4) ────────────────────────────────────
   const context = {
     d3: mockD3,
-    data: sample ?? [],
+    data: contextData,
     console: {
       log:   () => {},
       error: () => {},

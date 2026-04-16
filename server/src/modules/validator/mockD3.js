@@ -86,6 +86,13 @@ export function createMockD3() {
   // ── Chainable proxy ────────────────────────────────────────────────────────
   proxy = new Proxy({}, {
     get(_, prop) {
+      if (typeof prop === 'symbol') {
+        if (prop === Symbol.iterator) {
+           return function* () { yield proxy; };
+        }
+        return undefined;
+      }
+
       // ── Стейт (читання) ────────────────────────────────────────────────
       if (prop === '__state__') return state;
 

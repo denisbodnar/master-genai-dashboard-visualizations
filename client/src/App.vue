@@ -31,7 +31,7 @@
       <div class="content-area">
         <ChartRenderer 
           :code="generationResult?.code" 
-          :data="generationResult?.sample" 
+          :data="fullData" 
         />
       </div>
     </main>
@@ -46,6 +46,7 @@ import ConfigurationPanel from './components/ConfigurationPanel.vue';
 import GenerationLogs from './components/GenerationLogs.vue';
 import ChartRenderer from './components/ChartRenderer.vue';
 import { api } from './services/api';
+import * as d3 from 'd3';
 
 const BarChart2Icon = BarChart2;
 
@@ -54,14 +55,19 @@ const provider = ref('none');
 const mode = ref('zero-shot');
 const isGenerating = ref(false);
 const generationResult = ref(null);
+const fullData = ref(null);
 
 const handleGenerate = async () => {
   if (!selectedFile.value) return;
   
   isGenerating.value = true;
   generationResult.value = null;
+  fullData.value = null;
   
   try {
+    const text = await selectedFile.value.text();
+    fullData.value = d3.csvParse(text);
+
     const result = await api.generateChart(selectedFile.value, provider.value, mode.value);
     generationResult.value = result;
   } catch (err) {

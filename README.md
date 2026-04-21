@@ -10,7 +10,7 @@
 | Етап | Модуль | Статус | Тестів |
 |------|--------|--------|--------|
 | 1 | Schema Inference + Chart Selector | ✅ Завершено | 21 |
-| 2 | LLM Providers (OpenAI + Ollama) | ✅ Завершено | 25 |
+| 2 | LLM Providers (OpenAI + Ollama) | ✅ Завершено | 17 |
 | 3 | Prompt Builder (5 блоків, 3 режими) | ✅ Завершено | 26 |
 | 4 | Validator + Sandbox (AST + vm) | ✅ Завершено | 30 |
 | 5 | Orchestrator + Self-Refine | ✅ Завершено | 25 |
@@ -50,7 +50,7 @@ genai-viz/
 │       ├── validator.test.js
 │       ├── orchestrator.test.js
 │       └── logger.test.js
-├── datasets/                      10 локальних CSV-датасетів
+├── datasets/                      12 локальних CSV-датасетів
 │   ├── iris.csv                   D01 — scatter-color (N+C, UCI)
 │   ├── seattle-weather.csv        D03 — line (T+N+C, Vega)
 │   ├── disasters.csv              D04 — bar (C+N, Vega)
@@ -274,7 +274,7 @@ npm run exp:summarize -- --format json                  # JSON-звіт
 |---|---|---|
 | `schemaInference.test.js` | 8 | типізація, статистики, edge cases |
 | `chartSelector.test.js` | 13 | всі 7 правил, LLM-fallback, encoding |
-| `llmProvider.test.js` | 25 | payload, парсинг, retry, latency, factory |
+| `llmProvider.test.js` | 17 | payload, парсинг, retry, latency, factory |
 | `promptBuilder.test.js` | 26 | блоки, 3 режими, shots, snapshot, feedback |
 | `validator.test.js` | 30 | AST-перевірки, MockD3, sandbox, pipeline |
 | `orchestrator.test.js` | 25 | Self-Refine 3 сценарії, validationLog, extractor, fallback |

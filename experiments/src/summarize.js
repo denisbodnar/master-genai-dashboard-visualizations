@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * @fileoverview Агрегатор метрик для аналізу результатів матриці експериментів.
- * Підрозділ 5.2 записки: "Агрегація результатів по вісях provider, mode, dataset".
+ * Підрозділ 5.2 записки: агрегація по осях provider, mode, dataStrategy, dataset.
  *
  * Читає JSONL-файл (або директорію), рахує ключові метрики Розділу 5:
  * - Success Rate (%)
@@ -15,6 +15,7 @@
  * Використання:
  *   node src/summarize.js --log <path-to-jsonl>
  *   node src/summarize.js --dir <path-to-results-dir>
+ *   node src/summarize.js --format json
  */
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -28,9 +29,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const getArg = (flag, def = null) => { const i = args.indexOf(flag); return i >= 0 && args[i + 1] ? args[i + 1] : def; };
 
-const logFile  = getArg('--log');
-const logDir   = getArg('--dir') ? path.resolve(getArg('--dir')) : path.resolve(__dirname, '../../results');
-const outFormat = getArg('--format', 'table'); // 'table' | 'json'
+const logFile   = getArg('--log');
+const logDir    = getArg('--dir') ? path.resolve(getArg('--dir')) : path.resolve(__dirname, '../../results');
+const outFormat = getArg('--format', 'table');
 
 // ─── Завантаження JSONL-рядків ────────────────────────────────────────────────
 
@@ -106,33 +107,29 @@ function aggregate(entries) {
   };
 }
 
-// ─── Підготовка звітів ────────────────────────────────────────────────────────
-
-// Загальний
 const overall = aggregate(doneEntries);
 
-// По provider
+// Агрегація по трьох осях
 const byProvider = {};
-for (const e of doneEntries) {
-  const key = e.provider ?? 'unknown';
-  if (!byProvider[key]) byProvider[key] = [];
-  byProvider[key].push(e);
-}
+const byMode     = {};
+const byStrategy = {};
+const byDataset  = {};
 
-// По mode
-const byMode = {};
 for (const e of doneEntries) {
-  const key = e.mode ?? 'unknown';
-  if (!byMode[key]) byMode[key] = [];
-  byMode[key].push(e);
-}
+  const pKey = e.provider     ?? 'unknown';
+  const mKey = e.mode         ?? 'unknown';
+  const sKey = e.dataStrategy ?? 'unknown';
+  const dKey = `${e.datasetId}(${e.datasetName})`;
 
-// По dataset
-const byDataset = {};
-for (const e of doneEntries) {
-  const key = `${e.datasetId}(${e.datasetName})`;
-  if (!byDataset[key]) byDataset[key] = [];
-  byDataset[key].push(e);
+  if (!byProvider[pKey]) byProvider[pKey] = [];
+  if (!byMode[mKey])     byMode[mKey]     = [];
+  if (!byStrategy[sKey]) byStrategy[sKey] = [];
+  if (!byDataset[dKey])  byDataset[dKey]  = [];
+
+  byProvider[pKey].push(e);
+  byMode[mKey].push(e);
+  byStrategy[sKey].push(e);
+  byDataset[dKey].push(e);
 }
 
 // ─── Вивід ───────────────────────────────────────────────────────────────────
@@ -142,21 +139,20 @@ if (outFormat === 'json') {
     generatedAt: new Date().toISOString(),
     totalExperiments: doneEntries.length,
     overall,
-    byProvider: Object.fromEntries(Object.entries(byProvider).map(([k, v]) => [k, aggregate(v)])),
-    byMode:     Object.fromEntries(Object.entries(byMode).map(([k, v]) => [k, aggregate(v)])),
-    byDataset:  Object.fromEntries(Object.entries(byDataset).map(([k, v]) => [k, aggregate(v)])),
+    byProvider:   Object.fromEntries(Object.entries(byProvider).map(([k, v]) => [k, aggregate(v)])),
+    byMode:       Object.fromEntries(Object.entries(byMode).map(([k, v]) => [k, aggregate(v)])),
+    byStrategy:   Object.fromEntries(Object.entries(byStrategy).map(([k, v]) => [k, aggregate(v)])),
+    byDataset:    Object.fromEntries(Object.entries(byDataset).map(([k, v]) => [k, aggregate(v)])),
   };
   console.log(JSON.stringify(report, null, 2));
   process.exit(0);
 }
 
-// ── ASCII Table вивід ─────────────────────────────────────────────────────────
-
 const row = (label, m) => m
-  ? `  ${label.padEnd(22)} | ${m.successRate.padStart(8)} | ${m.fallbackRate.padStart(9)} | ${m.chartMatchRate.padStart(11)} | ${m.avgIterations.padStart(8)} | ${(m.avgLatencyMs + 'ms').padStart(11)} | ${(m.avgTokens + 'tok').padStart(9)}`
-  : `  ${label.padEnd(22)} | ${'N/A'.padStart(8)} | ${'N/A'.padStart(9)} | ${'N/A'.padStart(11)} | ${'N/A'.padStart(8)} | ${'N/A'.padStart(11)} | ${'N/A'.padStart(9)}`;
+  ? `  ${label.padEnd(24)} | ${m.successRate.padStart(8)} | ${m.fallbackRate.padStart(9)} | ${m.chartMatchRate.padStart(11)} | ${m.avgIterations.padStart(8)} | ${(m.avgLatencyMs + 'ms').padStart(11)} | ${(m.avgTokens + 'tok').padStart(9)}`
+  : `  ${label.padEnd(24)} | ${'N/A'.padStart(8)} | ${'N/A'.padStart(9)} | ${'N/A'.padStart(11)} | ${'N/A'.padStart(8)} | ${'N/A'.padStart(11)} | ${'N/A'.padStart(9)}`;
 
-const header = `  ${'Group'.padEnd(22)} | ${'Success%'.padStart(8)} | ${'Fallback%'.padStart(9)} | ${'ChartMatch%'.padStart(11)} | ${'AvgIter'.padStart(8)} | ${'AvgLatency'.padStart(11)} | ${'AvgTokens'.padStart(9)}`;
+const header  = `  ${'Group'.padEnd(24)} | ${'Success%'.padStart(8)} | ${'Fallback%'.padStart(9)} | ${'ChartMatch%'.padStart(11)} | ${'AvgIter'.padStart(8)} | ${'AvgLatency'.padStart(11)} | ${'AvgTokens'.padStart(9)}`;
 const divider = '─'.repeat(header.length);
 
 console.log('\n');
@@ -171,28 +167,23 @@ console.log(divider);
 console.log(row('OVERALL', overall));
 console.log(divider);
 
-// По провайдеру
 console.log('  BY PROVIDER');
-for (const [key, entries] of Object.entries(byProvider)) {
-  console.log(row(`  → ${key}`, aggregate(entries)));
-}
+for (const [k, v] of Object.entries(byProvider)) console.log(row(`  → ${k}`, aggregate(v)));
 console.log(divider);
 
-// По режиму
 console.log('  BY MODE');
-for (const [key, entries] of Object.entries(byMode)) {
-  console.log(row(`  → ${key}`, aggregate(entries)));
-}
+for (const [k, v] of Object.entries(byMode)) console.log(row(`  → ${k}`, aggregate(v)));
 console.log(divider);
 
-// По датасету
+// Ключова вісь порівняння (підрозділ 5.2)
+console.log('  BY DATA STRATEGY');
+for (const [k, v] of Object.entries(byStrategy)) console.log(row(`  → ${k}`, aggregate(v)));
+console.log(divider);
+
 console.log('  BY DATASET');
-for (const [key, entries] of Object.entries(byDataset)) {
-  console.log(row(`  → ${key}`, aggregate(entries)));
-}
+for (const [k, v] of Object.entries(byDataset)) console.log(row(`  → ${k}`, aggregate(v)));
 console.log(divider);
 
-// Розподіл помилок (загальний)
 console.log('\n  Error Type Distribution (all experiments):');
 const errorTypes = overall.errorTypes;
 const totalErrors = Object.values(errorTypes).reduce((s, v) => s + v, 0);

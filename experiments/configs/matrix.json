@@ -1,6 +1,7 @@
 {
   "providers": ["openai", "ollama"],
   "modes": ["zero-shot", "few-shot", "cot"],
+  "dataStrategies": ["schema-sample", "full-csv"],
   "datasets": [
     {
       "id": "D01",
@@ -14,7 +15,7 @@
     {
       "id": "D02",
       "name": "cars",
-      "file": "../datasets/iris.csv",
+      "file": "../datasets/cars.csv",
       "source": "Vega",
       "rows": 406,
       "expectedChart": "scatter",

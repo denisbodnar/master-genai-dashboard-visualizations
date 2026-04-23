@@ -91,22 +91,27 @@ app.post('/api/select-chart', upload.single('file'), async (req, res) => {
  * Повний pipeline: CSV → Schema → рекомендація → LLM-генерація → Self-Refine → артефакт.
  *
  * Query params:
- *   ?provider=ollama|openai  — LLM-провайдер (default: ollama)
- *   ?mode=zero-shot|few-shot|cot  — режим промпту (default: few-shot)
+ *   ?provider=ollama|openai           — LLM-провайдер (default: ollama)
+ *   ?mode=zero-shot|few-shot|cot      — режим промпту (default: few-shot)
+ *   ?strategy=schema-sample|full-csv  — стратегія передачі даних (default: schema-sample)
  */
 app.post('/api/generate', upload.single('file'), async (req, res) => {
   try {
     const csvText = extractCsv(req);
     if (!csvText) return res.status(400).json({ error: 'No CSV data provided' });
 
-    const providerName = req.query.provider ?? 'ollama';
-    const mode = req.query.mode ?? 'few-shot';
+    const providerName  = req.query.provider  ?? 'ollama';
+    const mode          = req.query.mode      ?? 'few-shot';
+    const dataStrategy  = req.query.strategy  ?? 'schema-sample';
 
     if (!['ollama', 'openai'].includes(providerName)) {
       return res.status(400).json({ error: `Unknown provider: "${providerName}". Valid: ollama, openai` });
     }
     if (!['zero-shot', 'few-shot', 'cot'].includes(mode)) {
       return res.status(400).json({ error: `Unknown mode: "${mode}". Valid: zero-shot, few-shot, cot` });
+    }
+    if (!['schema-sample', 'full-csv'].includes(dataStrategy)) {
+      return res.status(400).json({ error: `Unknown strategy: "${dataStrategy}". Valid: schema-sample, full-csv` });
     }
     if (providerName === 'openai' && !config.openai.apiKey) {
       return res.status(400).json({ error: 'OPENAI_API_KEY is not set' });
@@ -115,7 +120,7 @@ app.post('/api/generate', upload.single('file'), async (req, res) => {
     const llmProvider = createProvider(providerName);
     const result = await orchestrate({
       csv: csvText,
-      options: { provider: llmProvider, mode },
+      options: { provider: llmProvider, mode, dataStrategy },
     });
 
     return res.json(result);

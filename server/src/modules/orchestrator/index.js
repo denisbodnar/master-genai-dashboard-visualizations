@@ -3,17 +3,9 @@
  * Підрозділ 3.4 записки: координація всіх агентів та реалізація циклу
  * ітеративного виправлення (Self-Refine [24], Self-Debug [22, 23], LEVER [20, 21]).
  *
- * Послідовність (псевдокод з підрозділу 3.4):
- *   1. inferSchema(csv)             → schema
- *   2. selectChartType(schema)      → recommendation
- *   3. Self-Refine loop (до maxRefineIterations):
- *      a. buildPrompt(...)          → systemPrompt + userPrompt
- *      b. provider.generateCode()   → LLM response
- *      c. extractCodeBlock()        → code string
- *      d. validate(code)            → ok | error
- *      e. якщо error: buildFeedbackPrompt → provider.refineCode → validate
- *   4. Якщо ліміт: fallbackTemplate[chartType], status = 'fallback'
- *   5. Повернути уніфікований артефакт (підрозділ 3.4)
+ * Зміни відносно початкової версії:
+ *   - додано параметр dataStrategy ('schema-sample' | 'full-csv')
+ *   - csvText тепер передається до buildPrompt для full-csv режиму
  */
 
 import { performance } from 'node:perf_hooks';
@@ -30,6 +22,7 @@ import { config } from '../../config.js';
  * @typedef {object} OrchestrateOptions
  * @property {object|null}  [provider]              - LLM-провайдер (ILLMProvider).
  * @property {'zero-shot'|'few-shot'|'cot'} [mode]  - Режим промпту (default: 'zero-shot').
+ * @property {'schema-sample'|'full-csv'} [dataStrategy] - Стратегія передачі даних (default: 'schema-sample').
  * @property {number}       [maxRefineIterations]   - Макс. ітерацій Self-Refine (default: config).
  * @property {number}       [sandboxTimeoutMs]      - Таймаут sandbox (default: config).
  * @property {object|null}  [logger]                - ExperimentLogger (опційно).
@@ -57,11 +50,11 @@ import { config } from '../../config.js';
  * @property {number}   totalTokens
  * @property {object}   schema
  * @property {object[]} sample
+ * @property {string}   dataStrategy  — фіксується для логування в Розділі 5
  */
 
 /**
  * Головна функція оркестратора.
- * Координує весь pipeline від CSV до валідованого D3.js-коду.
  *
  * @param {object} params
  * @param {string} params.csv        - Текст CSV-файлу.
@@ -72,6 +65,7 @@ export async function orchestrate({ csv, options = {} }) {
   const {
     provider = null,
     mode = 'zero-shot',
+    dataStrategy = 'schema-sample',
     maxRefineIterations = config.refine.maxIterations,
     sandboxTimeoutMs = config.refine.sandboxTimeoutMs,
     logger = null,
@@ -82,6 +76,8 @@ export async function orchestrate({ csv, options = {} }) {
   let totalTokens = 0;
 
   // ── Крок 1: Schema Inference ───────────────────────────────────────────────
+  // Schema завжди обчислюється незалежно від dataStrategy:
+  // використовується для chartSelector та sandbox-валідації
   const schema = inferSchema(csv, config.schema);
   const sample = schema.sample ?? [];
 
@@ -91,10 +87,25 @@ export async function orchestrate({ csv, options = {} }) {
   const recommendation = await selectChartType(schema, provider);
   const { chartType, encoding } = recommendation;
 
-  if (logger) logger.log(null, { event: 'chart_selected', chartType, source: recommendation.source });
+  if (logger) logger.log(null, {
+    event: 'chart_selected',
+    chartType,
+    source: recommendation.source,
+    dataStrategy,
+  });
 
   // ── Крок 3: Промпт першої ітерації ───────────────────────────────────────
-  const prompt = await buildPrompt({ schema, chartType, encoding, mode });
+  // dataStrategy визначає вміст блоку B_schema:
+  //   'schema-sample' → Schema JSON + 3 рядки (підрозділ 2.3.2, за замовчуванням)
+  //   'full-csv'      → сирий CSV (перші 50 рядків)
+  const prompt = await buildPrompt({
+    schema,
+    chartType,
+    encoding,
+    mode,
+    dataStrategy,
+    csvText: csv,
+  });
 
   // ── Крок 4: Self-Refine цикл [24] ─────────────────────────────────────────
   let code = null;
@@ -106,13 +117,10 @@ export async function orchestrate({ csv, options = {} }) {
     iterationCount = i + 1;
     const iterStart = performance.now();
 
-    // ── Генерація / рефайнмент ────────────────────────────────────────────
     try {
       if (i === 0) {
-        // Перша ітерація — генерація з нуля
         llmResponse = await _callGenerateCode(provider, prompt, chartType);
       } else {
-        // Наступні ітерації — Self-Refine [24]: виправлення з feedback
         const feedbackPrompt = buildFeedbackPrompt({
           originalCode: code ?? '',
           errorTrace: _formatError(lastError),
@@ -127,7 +135,6 @@ export async function orchestrate({ csv, options = {} }) {
         llmResponse = await _callRefineCode(provider, code, lastError, feedbackPrompt, chartType);
       }
     } catch (llmErr) {
-      // LLM-помилка — логуємо та виходимо на fallback
       validationLog.push({
         iteration: iterationCount,
         ok: false,
@@ -152,7 +159,6 @@ export async function orchestrate({ csv, options = {} }) {
       });
     }
 
-    // ── Витягування коду з відповіді ─────────────────────────────────────
     const extracted = extractCodeBlock(llmResponse?.content ?? '');
     if (!extracted) {
       lastError = { errorType: 'no_code_block', message: 'LLM response did not contain a ```javascript block' };
@@ -169,7 +175,6 @@ export async function orchestrate({ csv, options = {} }) {
     }
     code = extracted;
 
-    // ── Валідація (Рівень 1 + Рівень 2) ──────────────────────────────────
     const validStart = performance.now();
     const validResult = validate(code, { schema, sample, timeoutMs: sandboxTimeoutMs });
     const validLatency = performance.now() - validStart;
@@ -194,7 +199,6 @@ export async function orchestrate({ csv, options = {} }) {
     });
 
     if (validResult.ok) {
-      // Успіх!
       return {
         status: 'success',
         code,
@@ -206,14 +210,14 @@ export async function orchestrate({ csv, options = {} }) {
         totalTokens,
         schema,
         sample,
+        dataStrategy,
       };
     }
 
-    // Зберігаємо помилку для наступної ітерації refine
     lastError = validResult;
   }
 
-  // ── Fallback: вичерпано всі ітерації ─────────────────────────────────────
+  // ── Fallback ──────────────────────────────────────────────────────────────
   if (logger) {
     logger.log(null, { event: 'fallback_triggered', chartType, iterations: iterationCount });
   }
@@ -231,27 +235,19 @@ export async function orchestrate({ csv, options = {} }) {
     totalTokens,
     schema,
     sample,
+    dataStrategy,
   };
 }
 
 // ─── Приватні хелпери ─────────────────────────────────────────────────────────
 
-/**
- * Викликає generateCode у провайдера або повертає заглушку якщо провайдер відсутній.
- * @private
- */
 async function _callGenerateCode(provider, prompt, chartType) {
   if (!provider || typeof provider.generateCode !== 'function') {
-    // Без провайдера — одразу повертаємо null (піде на fallback)
     throw new Error('No LLM provider configured. Use ?provider=openai or ?provider=ollama');
   }
   return provider.generateCode(prompt);
 }
 
-/**
- * Викликає refineCode у провайдера.
- * @private
- */
 async function _callRefineCode(provider, originalCode, error, feedbackPrompt, chartType) {
   if (!provider || typeof provider.refineCode !== 'function') {
     throw new Error('No LLM provider configured');
@@ -259,12 +255,6 @@ async function _callRefineCode(provider, originalCode, error, feedbackPrompt, ch
   return provider.refineCode(originalCode ?? '', _formatError(error), feedbackPrompt);
 }
 
-/**
- * Форматує об'єкт помилки у рядок для buildFeedbackPrompt.
- * @private
- * @param {object|null} error
- * @returns {string}
- */
 function _formatError(error) {
   if (!error) return 'Unknown error';
   const parts = [];

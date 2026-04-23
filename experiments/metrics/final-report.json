@@ -1,0 +1,286 @@
+
+> genai-viz@0.1.0 exp:summarize
+> node experiments/src/summarize.js --format json
+
+{
+  "generatedAt": "2026-04-23T15:15:04.937Z",
+  "totalExperiments": 129,
+  "overall": {
+    "n": 129,
+    "successRate": "69.0%",
+    "fallbackRate": "31.0%",
+    "chartMatchRate": "34.9%",
+    "avgIterations": "1.80",
+    "avgLatencyMs": "28278",
+    "avgTokens": "3120",
+    "errorTypes": {
+      "wrong_signature": 15,
+      "runtime": 124,
+      "data_not_bound": 4
+    }
+  },
+  "byProvider": {
+    "dry-run": {
+      "n": 45,
+      "successRate": "100.0%",
+      "fallbackRate": "0.0%",
+      "chartMatchRate": "20.0%",
+      "avgIterations": "1.33",
+      "avgLatencyMs": "34",
+      "avgTokens": "594",
+      "errorTypes": {
+        "wrong_signature": 15
+      }
+    },
+    "openai": {
+      "n": 42,
+      "successRate": "35.7%",
+      "fallbackRate": "64.3%",
+      "chartMatchRate": "42.9%",
+      "avgIterations": "2.29",
+      "avgLatencyMs": "23536",
+      "avgTokens": "5028",
+      "errorTypes": {
+        "runtime": 81
+      }
+    },
+    "ollama": {
+      "n": 42,
+      "successRate": "69.0%",
+      "fallbackRate": "31.0%",
+      "chartMatchRate": "42.9%",
+      "avgIterations": "1.81",
+      "avgLatencyMs": "63281",
+      "avgTokens": "3919",
+      "errorTypes": {
+        "runtime": 43,
+        "data_not_bound": 4
+      }
+    }
+  },
+  "byMode": {
+    "zero-shot": {
+      "n": 43,
+      "successRate": "58.1%",
+      "fallbackRate": "41.9%",
+      "chartMatchRate": "34.9%",
+      "avgIterations": "2.05",
+      "avgLatencyMs": "29195",
+      "avgTokens": "3420",
+      "errorTypes": {
+        "wrong_signature": 4,
+        "runtime": 55,
+        "data_not_bound": 4
+      }
+    },
+    "few-shot": {
+      "n": 43,
+      "successRate": "88.4%",
+      "fallbackRate": "11.6%",
+      "chartMatchRate": "34.9%",
+      "avgIterations": "1.42",
+      "avgLatencyMs": "25770",
+      "avgTokens": "2695",
+      "errorTypes": {
+        "wrong_signature": 7,
+        "runtime": 16
+      }
+    },
+    "cot": {
+      "n": 43,
+      "successRate": "60.5%",
+      "fallbackRate": "39.5%",
+      "chartMatchRate": "34.9%",
+      "avgIterations": "1.93",
+      "avgLatencyMs": "29869",
+      "avgTokens": "3245",
+      "errorTypes": {
+        "wrong_signature": 4,
+        "runtime": 53
+      }
+    }
+  },
+  "byDataset": {
+    "D01(iris)": {
+      "n": 12,
+      "successRate": "75.0%",
+      "fallbackRate": "25.0%",
+      "chartMatchRate": "0.0%",
+      "avgIterations": "1.58",
+      "avgLatencyMs": "19347",
+      "avgTokens": "2292",
+      "errorTypes": {
+        "wrong_signature": 1,
+        "runtime": 9
+      }
+    },
+    "D02(cars)": {
+      "n": 9,
+      "successRate": "55.6%",
+      "fallbackRate": "44.4%",
+      "chartMatchRate": "66.7%",
+      "avgIterations": "2.22",
+      "avgLatencyMs": "37189",
+      "avgTokens": "3746",
+      "errorTypes": {
+        "wrong_signature": 1,
+        "runtime": 14
+      }
+    },
+    "D03(seattle-weather)": {
+      "n": 9,
+      "successRate": "55.6%",
+      "fallbackRate": "44.4%",
+      "chartMatchRate": "0.0%",
+      "avgIterations": "2.00",
+      "avgLatencyMs": "39495",
+      "avgTokens": "4409",
+      "errorTypes": {
+        "wrong_signature": 1,
+        "runtime": 10,
+        "data_not_bound": 2
+      }
+    },
+    "D04(disasters)": {
+      "n": 9,
+      "successRate": "77.8%",
+      "fallbackRate": "22.2%",
+      "chartMatchRate": "0.0%",
+      "avgIterations": "1.56",
+      "avgLatencyMs": "14953",
+      "avgTokens": "2331",
+      "errorTypes": {
+        "wrong_signature": 1,
+        "runtime": 6
+      }
+    },
+    "D07(bike-sharing-day)": {
+      "n": 9,
+      "successRate": "66.7%",
+      "fallbackRate": "33.3%",
+      "chartMatchRate": "0.0%",
+      "avgIterations": "2.00",
+      "avgLatencyMs": "43831",
+      "avgTokens": "4908",
+      "errorTypes": {
+        "wrong_signature": 1,
+        "runtime": 11
+      }
+    },
+    "D08(adult-census)": {
+      "n": 9,
+      "successRate": "66.7%",
+      "fallbackRate": "33.3%",
+      "chartMatchRate": "0.0%",
+      "avgIterations": "1.89",
+      "avgLatencyMs": "28705",
+      "avgTokens": "2893",
+      "errorTypes": {
+        "runtime": 11
+      }
+    },
+    "D09(titanic)": {
+      "n": 9,
+      "successRate": "66.7%",
+      "fallbackRate": "33.3%",
+      "chartMatchRate": "0.0%",
+      "avgIterations": "2.11",
+      "avgLatencyMs": "27083",
+      "avgTokens": "3009",
+      "errorTypes": {
+        "wrong_signature": 3,
+        "runtime": 10
+      }
+    },
+    "D10(house-prices)": {
+      "n": 9,
+      "successRate": "77.8%",
+      "fallbackRate": "22.2%",
+      "chartMatchRate": "66.7%",
+      "avgIterations": "1.67",
+      "avgLatencyMs": "15310",
+      "avgTokens": "2573",
+      "errorTypes": {
+        "wrong_signature": 2,
+        "runtime": 6
+      }
+    },
+    "D12(gapminder)": {
+      "n": 9,
+      "successRate": "77.8%",
+      "fallbackRate": "22.2%",
+      "chartMatchRate": "66.7%",
+      "avgIterations": "1.44",
+      "avgLatencyMs": "16919",
+      "avgTokens": "2439",
+      "errorTypes": {
+        "runtime": 6
+      }
+    },
+    "D13(worldbank-gdp)": {
+      "n": 9,
+      "successRate": "77.8%",
+      "fallbackRate": "22.2%",
+      "chartMatchRate": "0.0%",
+      "avgIterations": "1.67",
+      "avgLatencyMs": "16926",
+      "avgTokens": "2376",
+      "errorTypes": {
+        "wrong_signature": 2,
+        "runtime": 6
+      }
+    },
+    "D15(budget-ua)": {
+      "n": 9,
+      "successRate": "66.7%",
+      "fallbackRate": "33.3%",
+      "chartMatchRate": "100.0%",
+      "avgIterations": "1.67",
+      "avgLatencyMs": "36425",
+      "avgTokens": "2701",
+      "errorTypes": {
+        "runtime": 9
+      }
+    },
+    "D16(population-ua)": {
+      "n": 9,
+      "successRate": "66.7%",
+      "fallbackRate": "33.3%",
+      "chartMatchRate": "100.0%",
+      "avgIterations": "1.78",
+      "avgLatencyMs": "42864",
+      "avgTokens": "2649",
+      "errorTypes": {
+        "wrong_signature": 1,
+        "runtime": 7,
+        "data_not_bound": 2
+      }
+    },
+    "D17(airbnb-listings)": {
+      "n": 9,
+      "successRate": "55.6%",
+      "fallbackRate": "44.4%",
+      "chartMatchRate": "0.0%",
+      "avgIterations": "2.00",
+      "avgLatencyMs": "43923",
+      "avgTokens": "5450",
+      "errorTypes": {
+        "wrong_signature": 1,
+        "runtime": 12
+      }
+    },
+    "D18(synthetic-edge)": {
+      "n": 9,
+      "successRate": "77.8%",
+      "fallbackRate": "22.2%",
+      "chartMatchRate": "100.0%",
+      "avgIterations": "1.67",
+      "avgLatencyMs": "15893",
+      "avgTokens": "2181",
+      "errorTypes": {
+        "wrong_signature": 1,
+        "runtime": 7
+      }
+    }
+  }
+}

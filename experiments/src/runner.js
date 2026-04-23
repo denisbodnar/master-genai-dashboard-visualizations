@@ -1,23 +1,24 @@
 #!/usr/bin/env node
 /**
  * @fileoverview Experiment Runner — CLI для запуску матриці експериментів.
- * Підрозділ 5.1 записки: "Запуск матриці (dataset × provider × mode)".
+ * Підрозділ 5.1 записки: "Запуск матриці (dataset × provider × mode × dataStrategy)".
  *
  * Використання:
  *   node src/runner.js [параметри]
  *
  * Параметри:
- *   --dataset <id>      Запустити конкретний датасет (D01, D03...). За замовч: all.
- *   --provider <name>   openai | ollama. За замовч: як у matrix.json.
- *   --mode <name>       zero-shot | few-shot | cot. За замовч: all modes.
- *   --dry-run           Використати mock-провайдер замість реального LLM.
- *   --out <dir>         Тека для JSONL-логів. За замовч: ../results/.
- *   --help              Показати довідку.
+ *   --dataset  <id>       Запустити конкретний датасет (D01, D03...). За замовч: all.
+ *   --provider <name>     openai | ollama. За замовч: як у matrix.json.
+ *   --mode     <name>     zero-shot | few-shot | cot. За замовч: all modes.
+ *   --strategy <name>     schema-sample | full-csv. За замовч: all strategies.
+ *   --dry-run             Використати mock-провайдер замість реального LLM.
+ *   --out      <dir>      Тека для JSONL-логів. За замовч: ../results/.
+ *   --help                Показати довідку.
  *
  * Приклади:
  *   node src/runner.js --dry-run
- *   node src/runner.js --dataset D01 --provider openai --mode zero-shot
- *   node src/runner.js --provider ollama
+ *   node src/runner.js --provider openai --mode few-shot --strategy schema-sample
+ *   node src/runner.js --dataset D01 --provider ollama --strategy full-csv
  */
 
 import { readFileSync, existsSync } from 'node:fs';
@@ -42,12 +43,13 @@ if (args.includes('--help')) {
 Usage: node src/runner.js [options]
 
 Options:
-  --dataset <id>     Run only specific dataset (e.g. D01, D03)
-  --provider <name>  openai | ollama (default: from matrix.json providers list)
-  --mode <name>      zero-shot | few-shot | cot (default: all modes)
-  --dry-run          Use mock LLM provider (no API keys required)
-  --out <dir>        Output JSONL directory (default: ../../results/)
-  --help             Show this help
+  --dataset  <id>      Run only specific dataset (e.g. D01, D03)
+  --provider <name>    openai | ollama (default: from matrix.json)
+  --mode     <name>    zero-shot | few-shot | cot (default: all modes)
+  --strategy <name>    schema-sample | full-csv (default: all strategies)
+  --dry-run            Use mock LLM provider (no API keys required)
+  --out      <dir>     Output JSONL directory (default: ../../results/)
+  --help               Show this help
 `);
   process.exit(0);
 }
@@ -57,22 +59,25 @@ const getArg = (flag, def = null) => {
   return idx >= 0 && args[idx + 1] ? args[idx + 1] : def;
 };
 
-const isDryRun     = args.includes('--dry-run');
-const filterDataset = getArg('--dataset');
-const filterProvider = getArg('--provider');
-const filterMode   = getArg('--mode');
-const outDir       = getArg('--out') ? path.resolve(getArg('--out')) : path.resolve(__dirname, '../../results');
+const isDryRun        = args.includes('--dry-run');
+const filterDataset   = getArg('--dataset');
+const filterProvider  = getArg('--provider');
+const filterMode      = getArg('--mode');
+const filterStrategy  = getArg('--strategy');
+const outDir          = getArg('--out')
+  ? path.resolve(getArg('--out'))
+  : path.resolve(__dirname, '../../results');
 
 // ─── Завантаження матриці ─────────────────────────────────────────────────────
 
 const matrixPath = path.resolve(__dirname, '../configs/matrix.json');
 const matrix     = JSON.parse(readFileSync(matrixPath, 'utf-8'));
 
-const providers = filterProvider ? [filterProvider] : (isDryRun ? ['dry-run'] : matrix.providers);
-const modes     = filterMode     ? [filterMode]     : matrix.modes;
-const datasets  = matrix.datasets.filter(d => {
+const providers      = filterProvider ? [filterProvider] : (isDryRun ? ['dry-run'] : matrix.providers);
+const modes          = filterMode     ? [filterMode]     : matrix.modes;
+const dataStrategies = filterStrategy ? [filterStrategy] : matrix.dataStrategies;
+const datasets       = matrix.datasets.filter(d => {
   if (filterDataset && d.id !== filterDataset) return false;
-  // Пропускаємо external датасети, якщо файл не існує
   if (d.external) {
     const filePath = path.resolve(__dirname, '..', d.file);
     if (!existsSync(filePath)) {
@@ -133,7 +138,7 @@ const logger = new JSONLLogger(logFile);
 
 // ─── Запуск матриці ───────────────────────────────────────────────────────────
 
-const total   = datasets.length * providers.length * modes.length;
+const total   = datasets.length * providers.length * modes.length * dataStrategies.length;
 let done      = 0;
 let succeeded = 0;
 let failed    = 0;
@@ -142,9 +147,10 @@ console.log('\n');
 console.log('╔══════════════════════════════════════════════════════════════╗');
 console.log('║              GenAI-Viz Experiment Runner                     ║');
 console.log('╚══════════════════════════════════════════════════════════════╝');
-console.log(`  Mode : ${isDryRun ? '🧪 DRY RUN (mock LLM)' : '🔥 LIVE'}`);
-console.log(`  Total: ${total} experiment(s)   (${datasets.length} datasets × ${providers.length} providers × ${modes.length} modes)`);
-console.log(`  Log  : ${logFile}`);
+console.log(`  Mode      : ${isDryRun ? '🧪 DRY RUN (mock LLM)' : '🔥 LIVE'}`);
+console.log(`  Total     : ${total} experiment(s)`);
+console.log(`  Breakdown : ${datasets.length} datasets × ${providers.length} providers × ${modes.length} modes × ${dataStrategies.length} strategies`);
+console.log(`  Log       : ${logFile}`);
 console.log('──────────────────────────────────────────────────────────────\n');
 
 for (const dataset of datasets) {
@@ -159,79 +165,80 @@ for (const dataset of datasets) {
 
   for (const providerName of providers) {
     for (const mode of modes) {
-      done++;
-      const label = `[${done}/${total}] ${dataset.id}(${dataset.name}) | ${providerName} | ${mode}`;
-      process.stdout.write(`  ▶ ${label} ... `);
+      for (const dataStrategy of dataStrategies) {
+        done++;
+        const label = `[${done}/${total}] ${dataset.id}(${dataset.name}) | ${providerName} | ${mode} | ${dataStrategy}`;
+        process.stdout.write(`  ▶ ${label} ... `);
 
-      const expStart = performance.now();
+        const expStart = performance.now();
 
-      // Вибір провайдера
-      let provider = null;
-      if (isDryRun || providerName === 'dry-run') {
-        provider = createMockProvider(0.4); // 40% шанс збою на першій ітерації
-      } else {
-        try {
-          provider = createProvider(providerName);
-        } catch (err) {
-          console.log(`SKIP (${err.message})`);
-          logger.log(null, {
-            event: 'experiment_skip',
-            datasetId: dataset.id, datasetName: dataset.name,
-            provider: providerName, mode,
-            reason: err.message
-          });
-          failed++;
-          continue;
+        // Вибір провайдера
+        let provider = null;
+        if (isDryRun || providerName === 'dry-run') {
+          provider = createMockProvider(0.4);
+        } else {
+          try {
+            provider = createProvider(providerName);
+          } catch (err) {
+            console.log(`SKIP (${err.message})`);
+            logger.log(null, {
+              event: 'experiment_skip',
+              datasetId: dataset.id, datasetName: dataset.name,
+              provider: providerName, mode, dataStrategy,
+              reason: err.message
+            });
+            failed++;
+            continue;
+          }
         }
-      }
 
-      const experimentId = `${dataset.id}__${providerName}__${mode}__${runId}`;
-
-      // Логуємо старт
-      logger.log(experimentId, {
-        event: 'experiment_start',
-        datasetId: dataset.id, datasetName: dataset.name,
-        expectedChart: dataset.expectedChart,
-        provider: providerName, mode,
-        csvRows: dataset.rows
-      });
-
-      let result;
-      try {
-        result = await orchestrate({
-          csv,
-          options: { provider, mode, logger: { log: (_, e) => logger.log(experimentId, e) } }
-        });
-
-        const elapsed = ((performance.now() - expStart) / 1000).toFixed(2);
-        const icon = result.status === 'success' ? '✅' : '⚠️ ';
-        console.log(`${icon} ${result.status.toUpperCase()} (${result.iterations} iter, ${elapsed}s, ${result.totalTokens}tok)`);
-        if (result.status === 'success') succeeded++; else failed++;
+        const experimentId = `${dataset.id}__${providerName}__${mode}__${dataStrategy}__${runId}`;
 
         logger.log(experimentId, {
-          event: 'experiment_done',
+          event: 'experiment_start',
           datasetId: dataset.id, datasetName: dataset.name,
           expectedChart: dataset.expectedChart,
-          actualChart: result.chartType,
-          chartMatch: result.chartType === dataset.expectedChart,
-          provider: providerName, mode,
-          status: result.status,
-          iterations: result.iterations,
-          totalLatencyMs: result.totalLatencyMs,
-          totalTokens: result.totalTokens,
-          validationLog: result.validationLog
+          provider: providerName, mode, dataStrategy,
+          csvRows: dataset.rows
         });
 
-      } catch (err) {
-        const elapsed = ((performance.now() - expStart) / 1000).toFixed(2);
-        console.log(`❌ ERROR (${elapsed}s): ${err.message}`);
-        failed++;
-        logger.log(experimentId, {
-          event: 'experiment_error',
-          datasetId: dataset.id, datasetName: dataset.name,
-          provider: providerName, mode,
-          error: err.message
-        });
+        let result;
+        try {
+          result = await orchestrate({
+            csv,
+            options: { provider, mode, dataStrategy, logger: { log: (_, e) => logger.log(experimentId, e) } }
+          });
+
+          const elapsed = ((performance.now() - expStart) / 1000).toFixed(2);
+          const icon = result.status === 'success' ? '✅' : '⚠️ ';
+          console.log(`${icon} ${result.status.toUpperCase()} (${result.iterations} iter, ${elapsed}s, ${result.totalTokens}tok)`);
+          if (result.status === 'success') succeeded++; else failed++;
+
+          logger.log(experimentId, {
+            event: 'experiment_done',
+            datasetId: dataset.id, datasetName: dataset.name,
+            expectedChart: dataset.expectedChart,
+            actualChart: result.chartType,
+            chartMatch: result.chartType === dataset.expectedChart,
+            provider: providerName, mode, dataStrategy,
+            status: result.status,
+            iterations: result.iterations,
+            totalLatencyMs: result.totalLatencyMs,
+            totalTokens: result.totalTokens,
+            validationLog: result.validationLog
+          });
+
+        } catch (err) {
+          const elapsed = ((performance.now() - expStart) / 1000).toFixed(2);
+          console.log(`❌ ERROR (${elapsed}s): ${err.message}`);
+          failed++;
+          logger.log(experimentId, {
+            event: 'experiment_error',
+            datasetId: dataset.id, datasetName: dataset.name,
+            provider: providerName, mode, dataStrategy,
+            error: err.message
+          });
+        }
       }
     }
   }

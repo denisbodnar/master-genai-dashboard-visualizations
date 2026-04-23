@@ -10,11 +10,11 @@ export const config = {
   port: Number(process.env.PORT) || 3001,
   openai: {
     apiKey: process.env.OPENAI_API_KEY,
-    model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
   },
   ollama: {
     baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-    model: process.env.OLLAMA_MODEL || 'qwen2.5-coder:3b',
+    model: process.env.OLLAMA_MODEL || 'qwen2.5-coder:14b',
   },
   schema: {
     analysisRows: Number(process.env.SCHEMA_ANALYSIS_ROWS) || 100,

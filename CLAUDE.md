@@ -24,6 +24,7 @@ npm run test:server   # 123 unit tests via node:test
 # Experiments
 npm run exp:run:dry   # Dry-run with mock LLM (no API key needed, 40% fallback rate)
 npm run exp:run       # Full experiment matrix (requires API keys in .env)
+                      # Supports flags: --dataset D01 --provider openai --mode few-shot --strategy schema-sample
 npm run exp:summarize # Generate ASCII metrics table from JSONL results
 
 # Run a single test file
@@ -46,9 +47,9 @@ Five sequential modules form the core pipeline:
 
 3. **`llmProvider/`** — Abstract `ILLMProvider` interface with `OpenAIProvider` (openai SDK, retry logic) and `OllamaProvider` (native fetch + AbortController timeout). `createProvider(name, overrides)` factory.
 
-4. **`promptBuilder/`** — Assembles 5-block prompts: `roleBlock + schemaBlock + chartBlock + shotsBlock + constraintsBlock`. Three modes: `zero-shot`, `few-shot` (injects 7 real D3.js examples from `examples/`), `cot` (Chain-of-Thought). Also builds `feedbackPrompt` for Self-Refine iterations.
+4. **`promptBuilder/`** — Assembles 5-block prompts: `roleBlock + schemaBlock + chartBlock + shotsBlock + constraintsBlock`. Three modes: `zero-shot`, `few-shot` (injects 7 real D3.js examples from `examples/`), `cot` (Chain-of-Thought). Two data strategies: `schema-sample` (default, Schema JSON + 3 sample rows) and `full-csv` (raw CSV, first 50 rows) — this is the key axis of comparison in experiments. Also builds `feedbackPrompt` for Self-Refine iterations.
 
-5. **`orchestrator/`** — Main facade. Runs the Self-Refine loop: generate → validate → (on error) refine → validate → ... (max `MAX_REFINE_ITERATIONS=3`). Returns `{ status, code, chartType, encoding, iterations, validationLog, totalLatencyMs, totalTokens }`. On loop exhaustion, falls back to `fallbackTemplates.js`.
+5. **`orchestrator/`** — Main facade. Runs the Self-Refine loop: generate → validate → (on error) refine → validate → ... (max `MAX_REFINE_ITERATIONS=3`). Accepts options `{ provider, mode, dataStrategy, maxRefineIterations, sandboxTimeoutMs, logger }`. Returns `{ status, code, chartType, encoding, iterations, validationLog, totalLatencyMs, totalTokens, dataStrategy }`. On loop exhaustion, falls back to `fallbackTemplates.js`.
 
 **Validator** (called by orchestrator, two levels):
 - **Level 1 Static** (`staticAnalyzer.js` via `acorn`): checks syntax, requires `function renderChart(data, containerSelector)` signature, blacklists `eval`, `fetch`, `XMLHttpRequest`, `d3.csv`, `d3.tsv`, `new Function`, `import()`.
@@ -59,7 +60,10 @@ Five sequential modules form the core pipeline:
 GET  /api/health      → {status, version}
 POST /api/analyze     → CSV → {schema}
 POST /api/select-chart → CSV → {schema, recommendation}
-POST /api/generate    → CSV + ?provider=openai|ollama&mode=zero-shot|few-shot|cot → orchestrate result
+POST /api/generate    → CSV + ?provider=openai|ollama
+                             &mode=zero-shot|few-shot|cot
+                             &strategy=schema-sample|full-csv
+                      → orchestrate result
 ```
 
 **Logger** (`logger/`): `JSONLLogger` writes synchronously via `appendFileSync` to JSONL format for experiment analysis.

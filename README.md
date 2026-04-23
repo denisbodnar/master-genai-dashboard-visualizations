@@ -11,7 +11,7 @@
 |------|--------|--------|--------|
 | 1 | Schema Inference + Chart Selector | ✅ Завершено | 21 |
 | 2 | LLM Providers (OpenAI + Ollama) | ✅ Завершено | 17 |
-| 3 | Prompt Builder (5 блоків, 3 режими) | ✅ Завершено | 26 |
+| 3 | Prompt Builder (5 блоків, 3 режими, 2 стратегії) | ✅ Завершено | 26 |
 | 4 | Validator + Sandbox (AST + vm) | ✅ Завершено | 30 |
 | 5 | Orchestrator + Self-Refine | ✅ Завершено | 25 |
 | 6 | Logger (JSONL) | ✅ Завершено | 4 |
@@ -143,11 +143,17 @@ curl -X POST -F "file=@datasets/sales_monthly.csv" \
 | `?mode=zero-shot` | (default) | пряма генерація |
 | `?mode=few-shot` | з прикладом | підсвічений D3 приклад у промпті |
 | `?mode=cot` | Chain of Thought | крок-за-кроком міркування |
+| `?strategy=schema-sample` | (default) | Schema JSON + 3 рядки вибірки |
+| `?strategy=full-csv` | сирий CSV (перші 50 рядків) | для експериментального порівняння |
 
 ```bash
 # Повний pipeline з OpenAI + CoT
 curl -X POST -F "file=@datasets/gapminder.csv" \
      "http://localhost:3001/api/generate?provider=openai&mode=cot"
+
+# Full CSV стратегія
+curl -X POST -F "file=@datasets/gapminder.csv" \
+     "http://localhost:3001/api/generate?provider=openai&mode=few-shot&strategy=full-csv"
 ```
 
 Відповідь містить: `status`, `code`, `chartType`, `encoding`, `iterations`, `validationLog`, `totalLatencyMs`, `totalTokens`, `schema`, `sample`.
@@ -177,6 +183,10 @@ curl -X POST -F "file=@datasets/gapminder.csv" \
 | `zero-shot` | role + schema + chart + constraints |
 | `few-shot` | + shots (приклад із `examples/`) |
 | `cot` | + CoT крок-за-кроком у role-блоці |
+
+Дві стратегії передачі даних (ключова вісь експериментального порівняння):
+- `schema-sample` (default) — Schema JSON (~200-400 токенів) + 3 рядки вибірки;
+- `full-csv` — сирий CSV (перші 50 рядків, 2000-5000 токенів) — для порівняння у Розділі 5.
 
 - **`feedbackPrompt.js`** — `buildFeedbackPrompt()` за Лістингом 3.2 (Self-Refine [24]).
 - **`examples/`** — 7 повних D3.js v7 прикладів: `line`, `bar`, `scatter`, `pie`, `multiline`, `grouped-bar`, `scatter-color`.
@@ -233,9 +243,9 @@ inferSchema → selectChartType → buildPrompt → generateCode
 
 **CLI Runner (`experiments/src/runner.js`):**
 ```bash
-npm run exp:run:dry                                     # Mock LLM (демо)
-npm run exp:run -- --provider openai --mode few-shot    # Реальний запуск
-npm run exp:run -- --dataset D01 --provider ollama      # Один датасет
+npm run exp:run:dry                                                   # Mock LLM (демо)
+npm run exp:run -- --provider openai --mode few-shot                  # OpenAI, обидві стратегії
+npm run exp:run -- --dataset D01 --provider ollama --strategy full-csv  # Один датасет, одна стратегія
 ```
 
 **Агрегатор (`experiments/src/summarize.js`):**
@@ -244,7 +254,7 @@ npm run exp:summarize                                   # ASCII-таблиця
 npm run exp:summarize -- --format json                  # JSON-звіт
 ```
 
-Метрики: Success Rate, Fallback Rate, ChartMatch%, AvgIterations, AvgLatency, AvgTokens, Error Type Distribution — по осях provider / mode / dataset.
+Метрики: Success Rate, Fallback Rate, ChartMatch%, AvgIterations, AvgLatency, AvgTokens, Error Type Distribution — по осях provider / mode / dataStrategy / dataset.
 
 ---
 
@@ -290,11 +300,11 @@ PORT=3001
 
 # OpenAI
 OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
+OPENAI_MODEL=gpt-4.1-mini
 
 # Ollama
 OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=qwen2.5-coder:3b
+OLLAMA_MODEL=qwen2.5-coder:14b
 
 # Schema inference
 SCHEMA_ANALYSIS_ROWS=100

@@ -1,22 +1,6 @@
 #!/usr/bin/env node
-/**
- * @fileoverview Агрегатор метрик для аналізу результатів матриці експериментів.
- * Підрозділ 5.2 записки: агрегація по осях provider, mode, dataStrategy, dataset.
- *
- * Читає JSONL-файл (або директорію), рахує ключові метрики Розділу 5:
- * - Success Rate (%)
- * - Fallback Rate (%)
- * - Avg Iterations (кількість ітерацій Self-Refine до успіху/fallback)
- * - Avg Total Latency (ms)
- * - Avg Total Tokens
- * - Chart Match Rate (% збігу actualChart з expectedChart)
- * - Error Type Distribution
- *
- * Використання:
- *   node src/summarize.js --log <path-to-jsonl>
- *   node src/summarize.js --dir <path-to-results-dir>
- *   node src/summarize.js --format json
- */
+// Aggregates experiment metrics from JSONL result files.
+// Usage: node src/summarize.js [--log <file>] [--dir <dir>] [--format json|table]
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
@@ -24,16 +8,12 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// ─── CLI аргументи ────────────────────────────────────────────────────────────
-
 const args = process.argv.slice(2);
 const getArg = (flag, def = null) => { const i = args.indexOf(flag); return i >= 0 && args[i + 1] ? args[i + 1] : def; };
 
 const logFile   = getArg('--log');
 const logDir    = getArg('--dir') ? path.resolve(getArg('--dir')) : path.resolve(__dirname, '../../results');
 const outFormat = getArg('--format', 'table');
-
-// ─── Завантаження JSONL-рядків ────────────────────────────────────────────────
 
 function loadLines(filePath) {
   const content = readFileSync(filePath, 'utf-8');
@@ -48,7 +28,6 @@ if (logFile) {
   if (!existsSync(logFile)) { console.error(`File not found: ${logFile}`); process.exit(1); }
   allEntries = loadLines(logFile);
 } else {
-  // Читаємо всі .jsonl файли з директорії
   if (!existsSync(logDir)) { console.error(`Results directory not found: ${logDir}`); process.exit(1); }
   const files = readdirSync(logDir).filter(f => f.endsWith('.jsonl'));
   if (files.length === 0) { console.error(`No .jsonl files found in ${logDir}`); process.exit(1); }
@@ -57,8 +36,6 @@ if (logFile) {
   }
 }
 
-// ─── Фільтруємо лише фінальні результати (experiment_done) ───────────────────
-
 const doneEntries = allEntries.filter(e => e.event === 'experiment_done');
 
 if (doneEntries.length === 0) {
@@ -66,12 +43,9 @@ if (doneEntries.length === 0) {
   process.exit(0);
 }
 
-// ─── Агрегація по вісях ───────────────────────────────────────────────────────
-
 /**
- * Рахує метрики для групи записів.
  * @param {object[]} entries
- * @returns {object} Агреговані метрики
+ * @returns {object}
  */
 function aggregate(entries) {
   const n = entries.length;
@@ -81,11 +55,10 @@ function aggregate(entries) {
   const fallbacks  = entries.filter(e => e.status === 'fallback');
   const chartMatch = entries.filter(e => e.chartMatch === true);
 
-  const avgIterations  = (entries.reduce((s, e) => s + (e.iterations  ?? 0), 0) / n).toFixed(2);
-  const avgLatencyMs   = (entries.reduce((s, e) => s + (e.totalLatencyMs ?? 0), 0) / n).toFixed(0);
-  const avgTokens      = (entries.reduce((s, e) => s + (e.totalTokens  ?? 0), 0) / n).toFixed(0);
+  const avgIterations = (entries.reduce((s, e) => s + (e.iterations  ?? 0), 0) / n).toFixed(2);
+  const avgLatencyMs  = (entries.reduce((s, e) => s + (e.totalLatencyMs ?? 0), 0) / n).toFixed(0);
+  const avgTokens     = (entries.reduce((s, e) => s + (e.totalTokens  ?? 0), 0) / n).toFixed(0);
 
-  // Розподіл типів помилок
   const errorTypes = {};
   for (const e of entries) {
     for (const log of e.validationLog ?? []) {
@@ -97,19 +70,18 @@ function aggregate(entries) {
 
   return {
     n,
-    successRate:  ((successes.length  / n) * 100).toFixed(1) + '%',
-    fallbackRate: ((fallbacks.length  / n) * 100).toFixed(1) + '%',
+    successRate:    ((successes.length  / n) * 100).toFixed(1) + '%',
+    fallbackRate:   ((fallbacks.length  / n) * 100).toFixed(1) + '%',
     chartMatchRate: ((chartMatch.length / n) * 100).toFixed(1) + '%',
     avgIterations,
     avgLatencyMs,
     avgTokens,
-    errorTypes
+    errorTypes,
   };
 }
 
 const overall = aggregate(doneEntries);
 
-// Агрегація по трьох осях
 const byProvider = {};
 const byMode     = {};
 const byStrategy = {};
@@ -131,8 +103,6 @@ for (const e of doneEntries) {
   byStrategy[sKey].push(e);
   byDataset[dKey].push(e);
 }
-
-// ─── Вивід ───────────────────────────────────────────────────────────────────
 
 if (outFormat === 'json') {
   const report = {
@@ -175,7 +145,6 @@ console.log('  BY MODE');
 for (const [k, v] of Object.entries(byMode)) console.log(row(`  → ${k}`, aggregate(v)));
 console.log(divider);
 
-// Ключова вісь порівняння (підрозділ 5.2)
 console.log('  BY DATA STRATEGY');
 for (const [k, v] of Object.entries(byStrategy)) console.log(row(`  → ${k}`, aggregate(v)));
 console.log(divider);

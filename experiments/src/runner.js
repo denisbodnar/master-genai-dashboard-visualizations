@@ -1,25 +1,7 @@
 #!/usr/bin/env node
-/**
- * @fileoverview Experiment Runner — CLI для запуску матриці експериментів.
- * Підрозділ 5.1 записки: "Запуск матриці (dataset × provider × mode × dataStrategy)".
- *
- * Використання:
- *   node src/runner.js [параметри]
- *
- * Параметри:
- *   --dataset  <id>       Запустити конкретний датасет (D01, D03...). За замовч: all.
- *   --provider <name>     openai | ollama. За замовч: як у matrix.json.
- *   --mode     <name>     zero-shot | few-shot | cot. За замовч: all modes.
- *   --strategy <name>     schema-sample | full-csv. За замовч: all strategies.
- *   --dry-run             Використати mock-провайдер замість реального LLM.
- *   --out      <dir>      Тека для JSONL-логів. За замовч: ../results/.
- *   --help                Показати довідку.
- *
- * Приклади:
- *   node src/runner.js --dry-run
- *   node src/runner.js --provider openai --mode few-shot --strategy schema-sample
- *   node src/runner.js --dataset D01 --provider ollama --strategy full-csv
- */
+// CLI runner for the experiment matrix (dataset × provider × mode × dataStrategy).
+// Usage: node src/runner.js [--dataset <id>] [--provider openai|ollama] [--mode zero-shot|few-shot|cot]
+//        [--strategy schema-sample|full-csv] [--dry-run] [--out <dir>] [--help]
 
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
@@ -29,15 +11,12 @@ import { performance } from 'node:perf_hooks';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 
-// Динамічний імпорт модулів сервера (monorepo-відносний шлях)
 const { orchestrate } = await import(`${ROOT}/server/src/modules/orchestrator/index.js`);
 const { JSONLLogger } = await import(`${ROOT}/server/src/modules/logger/index.js`);
 const { createProvider } = await import(`${ROOT}/server/src/modules/llmProvider/index.js`);
 
-// ─── Захист runner-а від uncaughtException у sandbox ──────────────────────────
-// vm-помилки у Node.js 22+ інколи проходять повз try/catch усередині
-// executeInSandbox (друкуються в stderr до розкрутки винятку). Без цих
-// обробників одна "погана" генерація обриває всю матрицю експериментів.
+// vm errors in Node.js 22+ can escape try/catch inside executeInSandbox and reach
+// the process level — without these handlers one bad generation aborts the whole matrix.
 process.on('uncaughtException', (err) => {
   console.error(`\n  ⚠  uncaughtException intercepted: ${err.message}`);
   console.error(`     (continuing experiment matrix)\n`);
@@ -48,8 +27,6 @@ process.on('unhandledRejection', (reason) => {
   console.error(`\n  ⚠  unhandledRejection intercepted: ${msg}`);
   console.error(`     (continuing experiment matrix)\n`);
 });
-
-// ─── Парсинг аргументів CLI ───────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
 
@@ -83,8 +60,6 @@ const outDir          = getArg('--out')
   ? path.resolve(getArg('--out'))
   : path.resolve(__dirname, '../../results');
 
-// ─── Завантаження матриці ─────────────────────────────────────────────────────
-
 const matrixPath = path.resolve(__dirname, '../configs/matrix.json');
 const matrix     = JSON.parse(readFileSync(matrixPath, 'utf-8'));
 
@@ -104,8 +79,6 @@ const datasets       = matrix.datasets.filter(d => {
   return true;
 });
 
-// ─── Mock-провайдер для --dry-run ─────────────────────────────────────────────
-
 const MOCK_VALID_CODE = `
 function renderChart(data, containerSelector) {
   const svg = d3.select(containerSelector).append('svg');
@@ -122,7 +95,6 @@ function createMockProvider(simulateFailRate = 0) {
   return {
     async generateCode() {
       callCount++;
-      // Симулюємо збій на першій ітерації з імовірністю simulateFailRate
       const code = (Math.random() < simulateFailRate && callCount === 1)
         ? 'function renderChart(data, c) { d3.select(c).append("svg"); }'  // no .data() → fail
         : MOCK_VALID_CODE;
@@ -145,13 +117,9 @@ function createMockProvider(simulateFailRate = 0) {
   };
 }
 
-// ─── Логер результатів ────────────────────────────────────────────────────────
-
 const runId = new Date().toISOString().replace(/[:.]/g, '-');
 const logFile = path.join(outDir, `run-${runId}.jsonl`);
 const logger = new JSONLLogger(logFile);
-
-// ─── Запуск матриці ───────────────────────────────────────────────────────────
 
 const total   = datasets.length * providers.length * modes.length * dataStrategies.length;
 let done      = 0;
@@ -187,7 +155,6 @@ for (const dataset of datasets) {
 
         const expStart = performance.now();
 
-        // Вибір провайдера
         let provider = null;
         if (isDryRun || providerName === 'dry-run') {
           provider = createMockProvider(0.4);
@@ -258,8 +225,6 @@ for (const dataset of datasets) {
     }
   }
 }
-
-// ─── Підсумок ─────────────────────────────────────────────────────────────────
 
 console.log('\n──────────────────────────────────────────────────────────────');
 console.log(`  Done : ${done}/${total}`);

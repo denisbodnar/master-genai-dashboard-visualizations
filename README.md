@@ -56,6 +56,54 @@ datasets/     CSV fixtures
 results/      JSONL experiment logs
 ```
 
+## Datasets
+
+18 CSV fixtures in `datasets/`. All are bundled; large external files (D09, D12, D15) are included as-is.
+
+| ID  | Name | Rows | Source | Expected chart | Notes |
+|-----|------|-----:|--------|----------------|-------|
+| D01 | iris | 60 | UCI | scatter-color | |
+| D02 | seattle-weather | 42 | Vega | line | |
+| D03 | disasters | 52 | Vega | bar | |
+| D04 | wine-quality-red | 1 599 | UCI | scatter | |
+| D05 | bike-sharing-day | 731 | UCI | line | |
+| D06 | adult-census | 18 | UCI | grouped-bar | |
+| D07 | titanic | 6 | Kaggle | bar | |
+| D08 | house-prices | 1 460 | Kaggle | scatter | |
+| D09 | covid-owid | 350 000 | OWID | line | large file |
+| D10 | gapminder | 62 | Gapminder | scatter | |
+| D11 | worldbank-gdp | 40 | World Bank | multiline | |
+| D12 | energy-consumption | 22 000 | OWID | line | large file |
+| D13 | budget-ua | 10 | data.gov.ua | bar | Cyrillic headers |
+| D14 | population-ua | 13 | Держстат | line | Cyrillic headers |
+| D15 | airbnb-listings | 38 000 | Inside Airbnb | scatter | large file |
+| D16 | synthetic-edge | 10 | synthetic | scatter | edge case |
+| D17 | sales-monthly | 13 | synthetic | multiline | |
+| D18 | products | 6 | synthetic | bar | |
+
+## Experiments
+
+Run the full experiment matrix (18 datasets × providers × modes × strategies):
+
+```bash
+# Dry run with mock LLM (no API keys needed)
+npm run exp:run:dry
+
+# Live run — OpenAI, few-shot, schema-sample strategy
+npm run exp:run -- --provider openai --mode few-shot
+
+# Single dataset, Ollama, full-csv strategy
+npm run exp:run -- --dataset D01 --provider ollama --strategy full-csv
+```
+
+Aggregate results from JSONL logs:
+
+```bash
+npm run exp:summarize                        # ASCII table
+npm run exp:summarize -- --format json       # JSON → experiments/metrics/final-report.json
+npm run exp:summarize -- --log results/run-<id>.jsonl  # specific run
+```
+
 ## REST API
 
 | Method | Path | Description |

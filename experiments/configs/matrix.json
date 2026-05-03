@@ -1,0 +1,182 @@
+{
+  "providers": [
+    "openai",
+    "ollama"
+  ],
+  "modes": [
+    "zero-shot",
+    "few-shot",
+    "cot"
+  ],
+  "dataStrategies": [
+    "schema-sample",
+    "full-csv"
+  ],
+  "datasets": [
+    {
+      "id": "D01",
+      "name": "iris",
+      "file": "../datasets/iris.csv",
+      "source": "UCI",
+      "rows": 60,
+      "expectedChart": "scatter-color",
+      "external": false
+    },
+    {
+      "id": "D02",
+      "name": "seattle-weather",
+      "file": "../datasets/seattle-weather.csv",
+      "source": "Vega",
+      "rows": 42,
+      "expectedChart": "line",
+      "external": false
+    },
+    {
+      "id": "D03",
+      "name": "disasters",
+      "file": "../datasets/disasters.csv",
+      "source": "Vega",
+      "rows": 52,
+      "expectedChart": "bar",
+      "external": false
+    },
+    {
+      "id": "D04",
+      "name": "wine-quality-red",
+      "file": "../datasets/winequality-red.csv",
+      "source": "UCI",
+      "rows": 1599,
+      "expectedChart": "scatter",
+      "external": false
+    },
+    {
+      "id": "D05",
+      "name": "bike-sharing-day",
+      "file": "../datasets/bike-sharing-day.csv",
+      "source": "UCI",
+      "rows": 731,
+      "expectedChart": "line",
+      "external": false
+    },
+    {
+      "id": "D06",
+      "name": "adult-census",
+      "file": "../datasets/adult-census.csv",
+      "source": "UCI",
+      "rows": 18,
+      "expectedChart": "grouped-bar",
+      "external": false
+    },
+    {
+      "id": "D07",
+      "name": "titanic",
+      "file": "../datasets/titanic.csv",
+      "source": "Kaggle",
+      "rows": 6,
+      "expectedChart": "bar",
+      "external": false
+    },
+    {
+      "id": "D08",
+      "name": "house-prices",
+      "file": "../datasets/house-prices.csv",
+      "source": "Kaggle",
+      "rows": 1460,
+      "expectedChart": "scatter",
+      "external": false
+    },
+    {
+      "id": "D09",
+      "name": "covid-owid",
+      "file": "../datasets/owid-covid-data.csv",
+      "source": "OWID",
+      "rows": 350000,
+      "expectedChart": "line",
+      "external": false
+    },
+    {
+      "id": "D10",
+      "name": "gapminder",
+      "file": "../datasets/gapminder.csv",
+      "source": "Gapminder",
+      "rows": 62,
+      "expectedChart": "scatter",
+      "external": false
+    },
+    {
+      "id": "D11",
+      "name": "worldbank-gdp",
+      "file": "../datasets/worldbank-gdp.csv",
+      "source": "World Bank",
+      "rows": 40,
+      "expectedChart": "multiline",
+      "external": false
+    },
+    {
+      "id": "D12",
+      "name": "energy-consumption",
+      "file": "../datasets/owid-energy-data.csv",
+      "source": "OWID",
+      "rows": 22000,
+      "expectedChart": "line",
+      "external": false
+    },
+    {
+      "id": "D13",
+      "name": "budget-ua",
+      "file": "../datasets/budget-ua.csv",
+      "source": "data.gov.ua",
+      "rows": 10,
+      "expectedChart": "bar",
+      "external": false,
+      "cyrillicHeaders": true
+    },
+    {
+      "id": "D14",
+      "name": "population-ua",
+      "file": "../datasets/population-ua.csv",
+      "source": "Держстат",
+      "rows": 13,
+      "expectedChart": "line",
+      "external": false,
+      "cyrillicHeaders": true
+    },
+    {
+      "id": "D15",
+      "name": "airbnb-listings",
+      "file": "../datasets/airbnb-listings.csv",
+      "source": "Inside Airbnb",
+      "rows": 38000,
+      "expectedChart": "scatter",
+      "external": false
+    },
+    {
+      "id": "D16",
+      "name": "synthetic-edge",
+      "file": "../datasets/synthetic-edge.csv",
+      "source": "synthetic",
+      "rows": 10,
+      "expectedChart": "scatter",
+      "external": false,
+      "edgeCase": true
+    },
+    {
+      "id": "D17",
+      "name": "sales-monthly",
+      "file": "../datasets/sales_monthly.csv",
+      "source": "synthetic",
+      "rows": 13,
+      "expectedChart": "multiline",
+      "external": false
+    },
+    {
+      "id": "D18",
+      "name": "products",
+      "file": "../datasets/products.csv",
+      "source": "synthetic",
+      "rows": 6,
+      "expectedChart": "bar",
+      "external": false
+    }
+  ]
+}

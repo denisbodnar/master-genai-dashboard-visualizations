@@ -1,0 +1,22 @@
+{
+  "name": "genai-viz",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "server",
+    "client",
+    "experiments"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "test:server": "npm run test --workspace=server",
+    "exp:run": "node experiments/src/runner.js",
+    "exp:run:dry": "node experiments/src/runner.js --dry-run",
+    "exp:summarize": "node experiments/src/summarize.js"
+  },
+  "engines": {
+    "node": ">=20.0.0 <23.0.0"
+  }
+}

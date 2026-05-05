@@ -1,6 +1,6 @@
 /**
- * @fileoverview Few-shot приклад для типу 'scatter' (діаграма розсіювання).
- * D3.js v7, динамічні розміри, tooltip, осі, підписи.
+ * @fileoverview Few-shot example for chart type 'scatter' (scatter plot).
+ * D3.js v7, dynamic sizing, tooltip, axes, labels.
  */
 
 export const schema = {

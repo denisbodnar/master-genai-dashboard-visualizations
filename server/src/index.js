@@ -21,7 +21,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 /**
- * Витягує CSV-текст з multipart-файлу або body.csv.
+ * Extracts CSV text from a multipart file upload or body.csv.
  */
 function extractCsv(req) {
   if (req.file) return req.file.buffer.toString('utf-8');
@@ -61,7 +61,7 @@ app.post('/api/select-chart', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'Provide CSV or body.schema' });
     }
 
-    // Вибір LLM-провайдера з query-параметра ?provider=
+    // Resolve LLM provider from the ?provider= query parameter
     let llmProvider = null;
     const providerName = req.query.provider;
     if (providerName === 'openai') {

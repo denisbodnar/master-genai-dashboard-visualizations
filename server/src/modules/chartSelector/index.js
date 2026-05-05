@@ -96,7 +96,7 @@ export async function selectChartType(schema, llmProvider = null) {
   }
 
   if (!llmProvider || typeof llmProvider.selectChartType !== 'function') {
-    // Fallback без LLM: обираємо найбільш загальний тип
+    // Fallback without LLM: select the most general chart type
     const counts = countColumnTypes(schema);
     const fallbackType = counts.Numeric >= 1 ? 'bar' : 'pie';
     return {

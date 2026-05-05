@@ -1,6 +1,6 @@
 /**
- * @fileoverview Few-shot приклад для типу 'pie' (кругова діаграма).
- * D3.js v7, динамічні розміри, легенда, tooltip.
+ * @fileoverview Few-shot example for chart type 'pie' (pie chart).
+ * D3.js v7, dynamic sizing, legend, tooltip.
  */
 
 export const schema = {

@@ -27,7 +27,7 @@ export async function buildPrompt({
   csvText = null,
   includeShots,
 }) {
-  // Блоки, присутні у всіх режимах
+  // Blocks present in all modes
   const roleBlock = buildRoleBlock({ chartType, mode });
   const chartBlock = buildChartBlock({ chartType, encoding });
   const constraintsBlock = buildConstraintsBlock();
@@ -39,7 +39,7 @@ export async function buildPrompt({
     schemaBlock = buildSchemaBlock(schema);
   }
 
-  // Визначаємо, чи включати few-shot
+  // Determine whether to include few-shot examples
   const useFewShot = includeShots !== undefined ? includeShots : mode === 'few-shot';
 
   const blocks = [roleBlock, schemaBlock, chartBlock];

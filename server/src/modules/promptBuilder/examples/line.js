@@ -1,7 +1,7 @@
 /**
- * @fileoverview Few-shot приклад для типу 'line' (лінійний графік).
- * Використовується блоком B_shots у few-shot та cot режимах.
- * D3.js v7, динамічні розміри, tooltip, осі, підписи.
+ * @fileoverview Few-shot example for chart type 'line' (line chart).
+ * Used by the B_shots block in few-shot and cot modes.
+ * D3.js v7, dynamic sizing, tooltip, axes, labels.
  */
 
 export const schema = {

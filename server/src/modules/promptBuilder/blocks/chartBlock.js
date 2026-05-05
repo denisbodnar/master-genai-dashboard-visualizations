@@ -1,12 +1,12 @@
 
 /**
- * Формує блок B_chart системного промпту.
+ * Builds the B_chart block of the system prompt.
  *
  * @param {object} opts
- * @param {string} opts.chartType - Тип графіка (визначений rule-based алгоритмом).
- * @param {object} opts.encoding  - Маппінг стовпців на ролі з resolveEncoding().
- *   Можливі поля: x, y, color, groupBy, category, value.
- * @returns {string} Текст блоку B_chart.
+ * @param {string} opts.chartType - Chart type (determined by the rule-based algorithm).
+ * @param {object} opts.encoding  - Column-to-role mapping from resolveEncoding().
+ *   Possible fields: x, y, color, groupBy, category, value.
+ * @returns {string} B_chart block text.
  */
 export function buildChartBlock({ chartType, encoding }) {
   const lines = [

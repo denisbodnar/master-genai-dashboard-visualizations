@@ -11,7 +11,7 @@ function parseCsv(csvText) {
   const result = Papa.parse(csvText, {
     header: true,
     skipEmptyLines: true,
-    dynamicTyping: false, // залишаємо рядки — типізацію робимо самі
+    dynamicTyping: false, // keep raw strings — type inference is handled separately
     transformHeader: (h) => h.trim(),
   });
   if (result.errors.length > 0) {

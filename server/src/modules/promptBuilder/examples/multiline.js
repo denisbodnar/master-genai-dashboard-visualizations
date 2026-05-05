@@ -1,6 +1,6 @@
 /**
- * @fileoverview Few-shot приклад для типу 'multiline' (мультилінійний графік).
- * D3.js v7, динамічні розміри, кольорова легенда, tooltip.
+ * @fileoverview Few-shot example for chart type 'multiline' (multi-line chart).
+ * D3.js v7, dynamic sizing, colour legend, tooltip.
  */
 
 export const schema = {

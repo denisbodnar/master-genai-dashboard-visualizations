@@ -1,6 +1,6 @@
 /**
- * @fileoverview Few-shot приклад для типу 'bar' (стовпчикова діаграма).
- * D3.js v7, динамічні розміри, tooltip, осі, підписи.
+ * @fileoverview Few-shot example for chart type 'bar' (bar chart).
+ * D3.js v7, dynamic sizing, tooltip, axes, labels.
  */
 
 export const schema = {

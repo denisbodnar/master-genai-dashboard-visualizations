@@ -1,73 +1,72 @@
 /**
- * @fileoverview Інтерфейс ILLMProvider — абстракція над LLM-провайдерами.
- * Підрозділ 2.5.2 записки: єдиний контракт для OpenAI та Ollama.
+ * @fileoverview ILLMProvider interface — abstraction over LLM providers.
  *
- * Усі методи є async і повертають уніфікований результат `LLMResponse`.
+ * All methods are async and return a unified `LLMResponse` result.
  */
 
 /**
  * @typedef {Object} LLMUsage
- * @property {number} promptTokens    - Кількість токенів у запиті.
- * @property {number} completionTokens - Кількість токенів у відповіді.
- * @property {number} latencyMs       - Час виконання запиту в мілісекундах.
+ * @property {number} promptTokens    - Number of tokens in the request.
+ * @property {number} completionTokens - Number of tokens in the response.
+ * @property {number} latencyMs       - Request execution time in milliseconds.
  */
 
 /**
  * @typedef {Object} LLMResponse
- * @property {string}   content - Текстовий вміст відповіді від моделі.
- * @property {LLMUsage} usage   - Статистика використання ресурсів.
- * @property {any}      raw     - Сирий об'єкт відповіді від API провайдера.
+ * @property {string}   content - Text content of the model's response.
+ * @property {LLMUsage} usage   - Resource usage statistics.
+ * @property {any}      raw     - Raw response object from the provider API.
  */
 
 /**
  * @typedef {Object} ChartSelectionInput
- * @property {object}   schema     - Schema JSON (результат inferSchema).
- * @property {string[]} candidates - Список допустимих типів графіків.
+ * @property {object}   schema     - Schema JSON (result of inferSchema).
+ * @property {string[]} candidates - List of permitted chart types.
  */
 
 /**
  * @typedef {Object} ChartSelectionResponse
- * @property {string} chartType - Обраний тип графіка.
- * @property {string} [reasoning] - Пояснення вибору від LLM (опційно).
+ * @property {string} chartType - Selected chart type.
+ * @property {string} [reasoning] - LLM explanation for the selection (optional).
  */
 
 /**
  * @interface ILLMProvider
  *
- * Єдиний інтерфейс для взаємодії з LLM-провайдерами.
- * Конкретні реалізації: `OpenAIProvider`, `OllamaProvider`.
+ * Unified interface for interacting with LLM providers.
+ * Concrete implementations: `OpenAIProvider`, `OllamaProvider`.
  *
- * Метод        | Вхід                               | Вихід
- * -------------|------------------------------------|-----------
- * generateCode | prompt (string), options (object)  | LLMResponse
- * refineCode   | originalCode, errorTrace, prompt   | LLMResponse
- * selectChartType | {schema, candidates}            | ChartSelectionResponse
+ * Method           | Input                              | Output
+ * -----------------|------------------------------------|-----------
+ * generateCode     | prompt (string), options (object)  | LLMResponse
+ * refineCode       | originalCode, errorTrace, prompt   | LLMResponse
+ * selectChartType  | {schema, candidates}               | ChartSelectionResponse
  */
 
 /**
- * Генерує D3.js-код на основі системного та користувацького промптів.
+ * Generates D3.js code from the system and user prompts.
  *
  * @function generateCode
  * @memberof ILLMProvider
- * @param {{ systemPrompt: string, userPrompt: string }} prompt - Сформований промпт.
- * @param {object} [options] - Додаткові параметри (temperature, max_tokens тощо).
+ * @param {{ systemPrompt: string, userPrompt: string }} prompt - Assembled prompt.
+ * @param {object} [options] - Additional parameters (temperature, max_tokens, etc.).
  * @returns {Promise<LLMResponse>}
  */
 
 /**
- * Уточнює раніше згенерований код на основі трасування помилки.
- * Використовується в циклі Self-Refine [24].
+ * Refines previously generated code based on an error trace.
+ * Used in the Self-Refine loop [24].
  *
  * @function refineCode
  * @memberof ILLMProvider
- * @param {string} originalCode  - Код, що не пройшов валідацію.
- * @param {string} errorTrace    - Повідомлення про помилку з validator.
- * @param {{ systemPrompt: string, userPrompt: string }} prompt - Feedback-промпт.
+ * @param {string} originalCode  - Code that failed validation.
+ * @param {string} errorTrace    - Error message from the validator.
+ * @param {{ systemPrompt: string, userPrompt: string }} prompt - Feedback prompt.
  * @returns {Promise<LLMResponse>}
  */
 
 /**
- * Обирає тип графіка на основі схеми даних (LLM-fallback для rule-based агента).
+ * Selects a chart type based on the data schema (LLM fallback for the rule-based agent).
  *
  * @function selectChartType
  * @memberof ILLMProvider

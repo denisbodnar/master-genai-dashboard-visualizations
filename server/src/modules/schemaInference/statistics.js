@@ -70,8 +70,8 @@ function computeTemporal(values) {
 }
 
 /**
- * Головна функція обчислення статистик.
- * @param {Array} rawValues - сирі значення стовпця (включно з порожніми).
+ * Main function for computing per-column statistics.
+ * @param {Array} rawValues - Raw column values (including empty/null).
  * @param {string} type - Temporal | Numeric | Categorical.
  */
 export function computeStats(rawValues, type) {

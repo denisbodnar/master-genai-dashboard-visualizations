@@ -1,6 +1,6 @@
 /**
- * @fileoverview Few-shot приклад для типу 'scatter-color' (scatter з кольоровим кодуванням).
- * D3.js v7, scaleOrdinal для кольору категорій, легенда, tooltip.
+ * @fileoverview Few-shot example for chart type 'scatter-color' (scatter plot with colour encoding).
+ * D3.js v7, scaleOrdinal for category colours, legend, tooltip.
  */
 
 export const schema = {

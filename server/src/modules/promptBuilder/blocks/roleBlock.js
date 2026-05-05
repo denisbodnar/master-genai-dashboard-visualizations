@@ -1,11 +1,11 @@
 
 /**
- * Формує блок B_role системного промпту.
+ * Builds the B_role block of the system prompt.
  *
  * @param {object} opts
- * @param {string} opts.chartType - Тип графіка (наприклад, 'bar', 'line').
- * @param {'zero-shot' | 'few-shot' | 'cot'} opts.mode - Режим генерації.
- * @returns {string} Текст блоку B_role.
+ * @param {string} opts.chartType - Chart type (e.g. 'bar', 'line').
+ * @param {'zero-shot' | 'few-shot' | 'cot'} opts.mode - Generation mode.
+ * @returns {string} B_role block text.
  */
 export function buildRoleBlock({ chartType, mode }) {
   const base = [

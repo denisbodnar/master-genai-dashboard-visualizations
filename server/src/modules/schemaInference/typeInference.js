@@ -7,7 +7,7 @@ const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}(?:[T\s]\d{2}:\d{2}(?::\d{2})?)?/;
 const EU_DATE_RE = /^\d{1,2}[./-]\d{1,2}[./-]\d{2,4}$/;
 
 /**
- * Перевіряє, чи значення відповідає одному з підтримуваних темпоральних форматів.
+ * Returns true if the value matches one of the supported temporal formats.
  */
 export function isTemporalValue(value) {
   if (typeof value !== 'string') return false;
@@ -17,7 +17,7 @@ export function isTemporalValue(value) {
 }
 
 /**
- * Перевіряє, чи значення парситься як кінцеве число.
+ * Returns true if the value parses as a finite number.
  */
 export function isNumericValue(value) {
   if (value === null || value === undefined || value === '') return false;
@@ -26,7 +26,7 @@ export function isNumericValue(value) {
 }
 
 /**
- * Визначає тип стовпця на основі порогових часток.
+ * Infers the column type based on threshold proportions.
  */
 export function inferColumnType(values) {
   const nonEmpty = values.filter((v) => v !== null && v !== undefined && v !== '');

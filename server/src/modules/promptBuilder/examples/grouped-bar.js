@@ -1,6 +1,6 @@
 /**
- * @fileoverview Few-shot приклад для типу 'grouped-bar' (згрупована стовпчикова діаграма).
- * D3.js v7, scaleBand вкладені, легенда, tooltip.
+ * @fileoverview Few-shot example for chart type 'grouped-bar' (grouped bar chart).
+ * D3.js v7, nested scaleBand, legend, tooltip.
  */
 
 export const schema = {

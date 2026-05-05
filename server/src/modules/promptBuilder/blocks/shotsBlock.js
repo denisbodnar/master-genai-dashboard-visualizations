@@ -1,12 +1,11 @@
 /**
- * @fileoverview Блок B_shots — few-shot приклади (опціонально).
- * Підрозділ 3.3 записки.
+ * @fileoverview B_shots block — few-shot examples (optional).
  *
- * Few-shot приклади знижують кількість синтаксичних помилок D3.js v7 API,
- * зокрема некоректне використання застарілих методів [35].
+ * Few-shot examples reduce the number of D3.js v7 API syntax errors,
+ * in particular incorrect use of deprecated methods [35].
  *
- * Завантажує приклад з `examples/{chartType}.js`.
- * Якщо приклад відсутній — повертає порожній рядок (graceful degradation).
+ * Loads an example from `examples/{chartType}.js`.
+ * If no example exists, returns an empty string (graceful degradation).
  */
 
 import { fileURLToPath } from 'node:url';
@@ -16,11 +15,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const EXAMPLES_DIR = path.resolve(__dirname, '../examples');
 
 /**
- * Формує блок B_shots системного промпту.
- * Динамічно імпортує приклад для заданого chartType.
+ * Builds the B_shots block of the system prompt.
+ * Dynamically imports the example for the given chartType.
  *
- * @param {string} chartType - Тип графіка (наприклад, 'bar', 'line').
- * @returns {Promise<string>} Текст блоку або порожній рядок, якщо приклад відсутній.
+ * @param {string} chartType - Chart type (e.g. 'bar', 'line').
+ * @returns {Promise<string>} Block text, or an empty string if no example exists.
  */
 export async function buildShotsBlock(chartType) {
   const examplePath = path.join(EXAMPLES_DIR, `${chartType}.js`);
@@ -30,7 +29,7 @@ export async function buildShotsBlock(chartType) {
     const mod = await import(`${examplePath}?t=${Date.now()}`);
     example = mod.default ?? mod;
   } catch {
-    // Приклад для даного типу графіка відсутній — повертаємо порожній рядок
+    // No example found for this chart type — return an empty string
     return '';
   }
 

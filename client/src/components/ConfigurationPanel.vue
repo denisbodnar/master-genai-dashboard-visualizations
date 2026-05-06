@@ -4,7 +4,6 @@
       <label class="field-label">LLM Provider</label>
       <select class="select-input" :value="provider" :disabled="isGenerating"
         @change="$emit('update:provider', $event.target.value)">
-        <option value="none">Rule-based (No LLM)</option>
         <option value="openai">OpenAI — GPT-4o</option>
         <option value="ollama">Ollama — Local</option>
       </select>

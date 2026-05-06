@@ -99,9 +99,10 @@ npm run exp:run -- --dataset D01 --provider ollama --strategy full-csv
 Aggregate results from JSONL logs:
 
 ```bash
-npm run exp:summarize                        # ASCII table
-npm run exp:summarize -- --format json       # JSON → experiments/metrics/final-report.json
-npm run exp:summarize -- --log results/run-<id>.jsonl  # specific run
+npm run exp:summarize                      # ASCII table
+npm run exp:summarize -- --format json     # JSON → stdout
+npm run exp:summarize -- --format json > report.json  # JSON → file (if needed)
+npm run exp:summarize -- --log results/run-<id>.jsonl # specific run
 ```
 
 ## REST API

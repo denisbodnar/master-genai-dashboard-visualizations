@@ -18,7 +18,7 @@
       "name": "iris",
       "file": "../datasets/iris.csv",
       "source": "UCI",
-      "rows": 60,
+      "rows": 149,
       "expectedChart": "scatter-color",
       "external": false
     },
@@ -27,7 +27,7 @@
       "name": "seattle-weather",
       "file": "../datasets/seattle-weather.csv",
       "source": "Vega",
-      "rows": 42,
+      "rows": 1460,
       "expectedChart": "line",
       "external": false
     },
@@ -36,7 +36,7 @@
       "name": "disasters",
       "file": "../datasets/disasters.csv",
       "source": "Vega",
-      "rows": 52,
+      "rows": 802,
       "expectedChart": "bar",
       "external": false
     },
@@ -63,7 +63,7 @@
       "name": "adult-census",
       "file": "../datasets/adult-census.csv",
       "source": "UCI",
-      "rows": 18,
+      "rows": 48840,
       "expectedChart": "grouped-bar",
       "external": false
     },
@@ -72,7 +72,7 @@
       "name": "titanic",
       "file": "../datasets/titanic.csv",
       "source": "Kaggle",
-      "rows": 6,
+      "rows": 890,
       "expectedChart": "bar",
       "external": false
     },
@@ -81,7 +81,7 @@
       "name": "house-prices",
       "file": "../datasets/house-prices.csv",
       "source": "Kaggle",
-      "rows": 1460,
+      "rows": 545,
       "expectedChart": "scatter",
       "external": false
     },
@@ -90,7 +90,7 @@
       "name": "covid-owid",
       "file": "../datasets/owid-covid-data.csv",
       "source": "OWID",
-      "rows": 350000,
+      "rows": 429435,
       "expectedChart": "line",
       "external": false
     },
@@ -99,7 +99,7 @@
       "name": "gapminder",
       "file": "../datasets/gapminder.csv",
       "source": "Gapminder",
-      "rows": 62,
+      "rows": 1703,
       "expectedChart": "scatter",
       "external": false
     },
@@ -117,7 +117,7 @@
       "name": "energy-consumption",
       "file": "../datasets/owid-energy-data.csv",
       "source": "OWID",
-      "rows": 22000,
+      "rows": 23232,
       "expectedChart": "line",
       "external": false
     },
@@ -146,7 +146,7 @@
       "name": "airbnb-listings",
       "file": "../datasets/airbnb-listings.csv",
       "source": "Inside Airbnb",
-      "rows": 38000,
+      "rows": 103005,
       "expectedChart": "scatter",
       "external": false
     },
@@ -165,7 +165,7 @@
       "name": "sales-monthly",
       "file": "../datasets/sales_monthly.csv",
       "source": "synthetic",
-      "rows": 13,
+      "rows": 12,
       "expectedChart": "multiline",
       "external": false
     },

@@ -1,4 +1,9 @@
-# genai-viz — LLM-driven D3.js dashboard generator with self-refine validation.
+# GenAI System for Automatic Generation of Interactive Dashboards and Data Visualizations
+This is a repository for masters thesis project in Computer Science
+
+Theme: Development and Research of a GenAI System for Automatic Generation of Interactive Dashboards and Data Visualizations
+Author: Denys Bodnar
+Supervisor: Vyacheslav Koldovskyy, PhD in Economics, Associate Professor at IT STEP University,
 
 ## Requirements
 

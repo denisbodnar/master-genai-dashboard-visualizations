@@ -6,6 +6,7 @@ import { inferSchema } from './modules/schemaInference/index.js';
 import { selectChartType } from './modules/chartSelector/index.js';
 import { createProvider } from './modules/llmProvider/index.js';
 import { orchestrate } from './modules/orchestrator/index.js';
+import { SUPPORTED_CHART_TYPES } from './modules/chartSelector/constants.js';
 
 const app = express();
 const upload = multer({
@@ -85,15 +86,22 @@ app.post('/api/select-chart', upload.single('file'), async (req, res) => {
  * POST /api/generate — full pipeline: CSV → schema → chart selection → LLM generation → Self-Refine.
  *
  * Query: ?provider=ollama|openai  ?mode=zero-shot|few-shot|cot  ?strategy=schema-sample|full-csv
+ *
+ * Body params (multipart/form-data):
+ *   file:       CSV file (required)
+ *   chartType?: 'bar'|'grouped-bar'|'line'|'multiline'|'scatter'|
+ *               'scatter-color'|'pie'|'heatmap'
+ *               (optional — overrides automatic chart type selection)
  */
 app.post('/api/generate', upload.single('file'), async (req, res) => {
   try {
     const csvText = extractCsv(req);
     if (!csvText) return res.status(400).json({ error: 'No CSV data provided' });
 
-    const providerName  = req.query.provider  ?? 'ollama';
-    const mode          = req.query.mode      ?? 'few-shot';
-    const dataStrategy  = req.query.strategy  ?? 'schema-sample';
+    const providerName     = req.query.provider  ?? 'ollama';
+    const mode             = req.query.mode      ?? 'few-shot';
+    const dataStrategy     = req.query.strategy  ?? 'schema-sample';
+    const chartTypeOverride = req.body?.chartType ?? null;
 
     if (!['ollama', 'openai'].includes(providerName)) {
       return res.status(400).json({ error: `Unknown provider: "${providerName}". Valid: ollama, openai` });
@@ -107,11 +115,16 @@ app.post('/api/generate', upload.single('file'), async (req, res) => {
     if (providerName === 'openai' && !config.openai.apiKey) {
       return res.status(400).json({ error: 'OPENAI_API_KEY is not set' });
     }
+    if (chartTypeOverride !== null && !SUPPORTED_CHART_TYPES.includes(chartTypeOverride)) {
+      return res.status(400).json({
+        error: `Unknown chartType: "${chartTypeOverride}". Valid: ${SUPPORTED_CHART_TYPES.join(', ')}`,
+      });
+    }
 
     const llmProvider = createProvider(providerName);
     const result = await orchestrate({
       csv: csvText,
-      options: { provider: llmProvider, mode, dataStrategy },
+      options: { provider: llmProvider, mode, dataStrategy, chartTypeOverride },
     });
 
     return res.json(result);

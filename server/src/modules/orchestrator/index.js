@@ -2,7 +2,7 @@
 
 import { performance } from 'node:perf_hooks';
 import { inferSchema } from '../schemaInference/index.js';
-import { selectChartType } from '../chartSelector/index.js';
+import { selectChartType, resolveEncoding } from '../chartSelector/index.js';
 import { buildPrompt } from '../promptBuilder/index.js';
 import { buildFeedbackPrompt } from '../promptBuilder/feedbackPrompt.js';
 import { validate } from '../validator/index.js';
@@ -15,6 +15,7 @@ import { config } from '../../config.js';
  * @property {object|null}  [provider]              - LLM provider (ILLMProvider).
  * @property {'zero-shot'|'few-shot'|'cot'} [mode]  - Prompt mode (default: 'zero-shot').
  * @property {'schema-sample'|'full-csv'} [dataStrategy] - Data transfer strategy (default: 'schema-sample').
+ * @property {string|null}  [chartTypeOverride]     - User-specified chart type; skips automatic selection.
  * @property {number}       [maxRefineIterations]   - Max Self-Refine iterations (default: config).
  * @property {number}       [sandboxTimeoutMs]      - Sandbox timeout (default: config).
  * @property {object|null}  [logger]                - ExperimentLogger (optional).
@@ -56,6 +57,7 @@ export async function orchestrate({ csv, options = {} }) {
     provider = null,
     mode = 'zero-shot',
     dataStrategy = 'schema-sample',
+    chartTypeOverride = null,
     maxRefineIterations = config.refine.maxIterations,
     sandboxTimeoutMs = config.refine.sandboxTimeoutMs,
     logger = null,
@@ -70,7 +72,17 @@ export async function orchestrate({ csv, options = {} }) {
 
   if (logger) logger.log(null, { event: 'schema_inferred', chartType: null });
 
-  const recommendation = await selectChartType(schema, provider);
+  let recommendation;
+  if (chartTypeOverride) {
+    recommendation = {
+      chartType: chartTypeOverride,
+      source:    'user-override',
+      reasoning: 'Manual selection by user via UI/API',
+      encoding:  resolveEncoding(chartTypeOverride, schema),
+    };
+  } else {
+    recommendation = await selectChartType(schema, provider);
+  }
   const { chartType, encoding } = recommendation;
 
   if (logger) logger.log(null, {

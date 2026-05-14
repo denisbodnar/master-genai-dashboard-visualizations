@@ -14,10 +14,19 @@
       <aside class="sidebar">
         <div class="glass-panel card-section fade-up fade-up-1">
           <div class="section-label">Dataset</div>
-          <FileUploader :file="selectedFile" @update:file="selectedFile = $event" />
+          <FileUploader :file="selectedFile" @update:file="handleFileChange" />
         </div>
 
         <div class="glass-panel card-section fade-up fade-up-2">
+          <div class="section-label">Chart Type</div>
+          <ChartTypeSelector
+            :recommended-type="recommendedType"
+            v-model="userChartType"
+            :disabled="isGenerating"
+          />
+        </div>
+
+        <div class="glass-panel card-section fade-up fade-up-3">
           <div class="section-label">Configuration</div>
           <ConfigurationPanel
             v-model:provider="provider"
@@ -51,17 +60,20 @@
 import { ref, computed } from 'vue';
 import FileUploader from './components/FileUploader.vue';
 import ConfigurationPanel from './components/ConfigurationPanel.vue';
+import ChartTypeSelector from './components/ChartTypeSelector.vue';
 import GenerationLogs from './components/GenerationLogs.vue';
 import ChartRenderer from './components/ChartRenderer.vue';
 import { api } from './services/api';
 import * as d3 from 'd3';
 
-const selectedFile = ref(null);
-const provider = ref('none');
-const mode = ref('zero-shot');
-const isGenerating = ref(false);
+const selectedFile    = ref(null);
+const provider        = ref('none');
+const mode            = ref('zero-shot');
+const isGenerating    = ref(false);
 const generationResult = ref(null);
-const fullData = ref(null);
+const fullData        = ref(null);
+const recommendedType = ref(null);   // from /api/select-chart
+const userChartType   = ref(null);   // override selected by user (null = auto)
 
 const appStatus = computed(() => {
   if (isGenerating.value) return 'generating';
@@ -78,6 +90,22 @@ const statusLabel = computed(() => ({
   fallback:   'Fallback',
 })[appStatus.value] || 'Ready');
 
+const handleFileChange = async (file) => {
+  selectedFile.value    = file;
+  recommendedType.value = null;
+  userChartType.value   = null;
+  generationResult.value = null;
+
+  if (file) {
+    try {
+      const result = await api.selectChart(file);
+      recommendedType.value = result.recommendation?.chartType ?? null;
+    } catch {
+      // Non-critical: selector failure should not block generation
+    }
+  }
+};
+
 const handleGenerate = async () => {
   if (!selectedFile.value) return;
 
@@ -89,7 +117,12 @@ const handleGenerate = async () => {
     const text = await selectedFile.value.text();
     fullData.value = d3.csvParse(text);
 
-    const result = await api.generateChart(selectedFile.value, provider.value, mode.value);
+    const result = await api.generateChart(
+      selectedFile.value,
+      provider.value,
+      mode.value,
+      userChartType.value,   // null → server auto-selects
+    );
     generationResult.value = result;
   } catch (err) {
     console.error('Generation failed:', err);

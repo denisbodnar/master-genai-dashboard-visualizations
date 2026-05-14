@@ -18,7 +18,7 @@ function minCategoricalCardinality(schema) {
   return Math.min(...cats.map((c) => c.cardinality ?? Infinity));
 }
 
-function resolveEncoding(chartType, schema) {
+export function resolveEncoding(chartType, schema) {
   const byType = {
     Temporal: schema.columns.filter((c) => c.type === 'Temporal'),
     Numeric: schema.columns.filter((c) => c.type === 'Numeric'),

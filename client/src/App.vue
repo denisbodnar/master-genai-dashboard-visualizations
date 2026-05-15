@@ -51,6 +51,10 @@
           :result="generationResult"
           :is-generating="isGenerating"
         />
+        <PromptInspector
+          class="fade-up fade-up-4"
+          :result="generationResult"
+        />
       </div>
     </main>
   </div>
@@ -62,6 +66,7 @@ import FileUploader from './components/FileUploader.vue';
 import ConfigurationPanel from './components/ConfigurationPanel.vue';
 import ChartTypeSelector from './components/ChartTypeSelector.vue';
 import GenerationLogs from './components/GenerationLogs.vue';
+import PromptInspector from './components/PromptInspector.vue';
 import ChartRenderer from './components/ChartRenderer.vue';
 import { api } from './services/api';
 import * as d3 from 'd3';

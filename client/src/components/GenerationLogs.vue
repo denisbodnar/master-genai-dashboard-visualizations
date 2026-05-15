@@ -33,11 +33,14 @@
         <div class="log-row-header">
           <component :is="CheckIcon" class="row-icon text-success" />
           <span class="row-label">Schema Inferred</span>
+          <span v-if="result.chartSource" class="badge badge-source">{{ result.chartSource }}</span>
         </div>
         <div class="row-detail">
           Type: <span class="detail-accent">{{ result.chartType }}</span>
           · {{ result.schema?.columns?.length ?? '—' }} columns
-          · {{ result.status === 'fallback' ? 'rule-based' : 'LLM inference' }}
+        </div>
+        <div v-if="result.chartReasoning" class="row-detail row-reasoning">
+          {{ result.chartReasoning }}
         </div>
       </div>
 
@@ -253,6 +256,23 @@ const LoaderIcon = Loader2;
 .text-success  { color: var(--success); }
 .text-error    { color: var(--error); }
 .text-warning  { color: var(--warning); }
+
+.badge-source {
+  font-size: 0.58rem;
+  padding: 1px 6px;
+  border-radius: 20px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(31, 111, 235, 0.08);
+  color: var(--accent);
+  border: 1px solid rgba(31, 111, 235, 0.2);
+}
+
+.row-reasoning {
+  font-style: italic;
+  margin-top: 1px;
+}
 
 .spin {
   animation: spin 1.5s linear infinite;

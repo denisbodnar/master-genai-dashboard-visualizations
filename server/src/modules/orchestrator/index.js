@@ -84,11 +84,13 @@ export async function orchestrate({ csv, options = {} }) {
     recommendation = await selectChartType(schema, provider);
   }
   const { chartType, encoding } = recommendation;
+  const chartSource  = recommendation.source;
+  const chartReasoning = recommendation.reasoning ?? null;
 
   if (logger) logger.log(null, {
     event: 'chart_selected',
     chartType,
-    source: recommendation.source,
+    source: chartSource,
     dataStrategy,
   });
 
@@ -105,6 +107,7 @@ export async function orchestrate({ csv, options = {} }) {
   let lastError = null;
   let llmResponse = null;
   let iterationCount = 0;
+  const llmRawResponses = [];
 
   for (let i = 0; i < maxRefineIterations; i++) {
     iterationCount = i + 1;
@@ -142,6 +145,12 @@ export async function orchestrate({ csv, options = {} }) {
     const iterLatency = performance.now() - iterStart;
     const iterTokens = (llmResponse?.usage?.promptTokens ?? 0) + (llmResponse?.usage?.completionTokens ?? 0);
     totalTokens += iterTokens;
+
+    llmRawResponses.push({
+      iteration: iterationCount,
+      content: llmResponse?.content ?? '',
+      usage: llmResponse?.usage ?? {},
+    });
 
     if (logger) {
       logger.log(null, {
@@ -204,6 +213,10 @@ export async function orchestrate({ csv, options = {} }) {
         schema,
         sample,
         dataStrategy,
+        prompt,
+        llmRawResponses,
+        chartSource,
+        chartReasoning,
       };
     }
 
@@ -228,6 +241,10 @@ export async function orchestrate({ csv, options = {} }) {
     schema,
     sample,
     dataStrategy,
+    prompt,
+    llmRawResponses,
+    chartSource,
+    chartReasoning,
   };
 }
 
